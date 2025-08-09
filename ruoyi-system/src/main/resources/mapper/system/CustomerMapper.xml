@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.CustomerMapper">
+    
+    <resultMap type="Customer" id="CustomerResult">
+        <result property="id"    column="id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="companyName"    column="company_name"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="status"    column="status"    />
+        <result property="customerType"    column="customer_type"    />
+        <result property="customerSource"    column="customer_source"    />
+        <result property="customerDescription"    column="customer_description"    />
+        <result property="countryRegion"    column="country_region"    />
+        <result property="customerLevel"    column="customer_level"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="followupContent"    column="followup_content"    />
+        <result property="followupDate"    column="followup_date"    />
+        <result property="position"    column="position"    />
+        <result property="contactPhone"    column="contact_phone"    />
+        <result property="email"    column="email"    />
+        <result property="otherContact"    column="other_contact"    />
+        <result property="companyWebsite"    column="company_website"    />
+        <result property="companyAddress"    column="company_address"    />
+        <result property="attachment"    column="attachment"    />
+    </resultMap>
+
+    <sql id="selectCustomerVo">
+        select id, customer_id, company_name, customer_name, status, customer_type, customer_source, customer_description, country_region, customer_level, created_at, followup_content, followup_date, position, contact_phone, email, other_contact, company_website, company_address, attachment from customer
+    </sql>
+
+    <select id="selectCustomerList" parameterType="Customer" resultMap="CustomerResult">
+        <include refid="selectCustomerVo"/>
+        <where>  
+            <if test="customerId != null  and customerId != ''"> and customer_id = #{customerId}</if>
+            <if test="companyName != null  and companyName != ''"> and company_name like concat('%', #{companyName}, '%')</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="customerType != null  and customerType != ''"> and customer_type = #{customerType}</if>
+            <if test="customerSource != null  and customerSource != ''"> and customer_source = #{customerSource}</if>
+            <if test="customerDescription != null  and customerDescription != ''"> and customer_description = #{customerDescription}</if>
+            <if test="countryRegion != null  and countryRegion != ''"> and country_region = #{countryRegion}</if>
+            <if test="customerLevel != null  and customerLevel != ''"> and customer_level = #{customerLevel}</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+            <if test="followupContent != null  and followupContent != ''"> and followup_content = #{followupContent}</if>
+            <if test="followupDate != null "> and followup_date = #{followupDate}</if>
+            <if test="position != null  and position != ''"> and position = #{position}</if>
+            <if test="contactPhone != null  and contactPhone != ''"> and contact_phone = #{contactPhone}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="otherContact != null  and otherContact != ''"> and other_contact = #{otherContact}</if>
+            <if test="companyWebsite != null  and companyWebsite != ''"> and company_website = #{companyWebsite}</if>
+            <if test="companyAddress != null  and companyAddress != ''"> and company_address = #{companyAddress}</if>
+            <if test="attachment != null  and attachment != ''"> and attachment = #{attachment}</if>
+        </where>
+    </select>
+    
+    <select id="selectCustomerById" parameterType="Long" resultMap="CustomerResult">
+        <include refid="selectCustomerVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCustomer" parameterType="Customer" useGeneratedKeys="true" keyProperty="id">
+        insert into customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerId != null and customerId != ''">customer_id,</if>
+            <if test="companyName != null and companyName != ''">company_name,</if>
+            <if test="customerName != null and customerName != ''">customer_name,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="customerType != null and customerType != ''">customer_type,</if>
+            <if test="customerSource != null and customerSource != ''">customer_source,</if>
+            <if test="customerDescription != null">customer_description,</if>
+            <if test="countryRegion != null and countryRegion != ''">country_region,</if>
+            <if test="customerLevel != null">customer_level,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="followupContent != null">followup_content,</if>
+            <if test="followupDate != null">followup_date,</if>
+            <if test="position != null">position,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="email != null">email,</if>
+            <if test="otherContact != null">other_contact,</if>
+            <if test="companyWebsite != null">company_website,</if>
+            <if test="companyAddress != null">company_address,</if>
+            <if test="attachment != null">attachment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerId != null and customerId != ''">#{customerId},</if>
+            <if test="companyName != null and companyName != ''">#{companyName},</if>
+            <if test="customerName != null and customerName != ''">#{customerName},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="customerType != null and customerType != ''">#{customerType},</if>
+            <if test="customerSource != null and customerSource != ''">#{customerSource},</if>
+            <if test="customerDescription != null">#{customerDescription},</if>
+            <if test="countryRegion != null and countryRegion != ''">#{countryRegion},</if>
+            <if test="customerLevel != null">#{customerLevel},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="followupContent != null">#{followupContent},</if>
+            <if test="followupDate != null">#{followupDate},</if>
+            <if test="position != null">#{position},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="email != null">#{email},</if>
+            <if test="otherContact != null">#{otherContact},</if>
+            <if test="companyWebsite != null">#{companyWebsite},</if>
+            <if test="companyAddress != null">#{companyAddress},</if>
+            <if test="attachment != null">#{attachment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCustomer" parameterType="Customer">
+        update customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerId != null and customerId != ''">customer_id = #{customerId},</if>
+            <if test="companyName != null and companyName != ''">company_name = #{companyName},</if>
+            <if test="customerName != null and customerName != ''">customer_name = #{customerName},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="customerType != null and customerType != ''">customer_type = #{customerType},</if>
+            <if test="customerSource != null and customerSource != ''">customer_source = #{customerSource},</if>
+            <if test="customerDescription != null">customer_description = #{customerDescription},</if>
+            <if test="countryRegion != null and countryRegion != ''">country_region = #{countryRegion},</if>
+            <if test="customerLevel != null">customer_level = #{customerLevel},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="followupContent != null">followup_content = #{followupContent},</if>
+            <if test="followupDate != null">followup_date = #{followupDate},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="otherContact != null">other_contact = #{otherContact},</if>
+            <if test="companyWebsite != null">company_website = #{companyWebsite},</if>
+            <if test="companyAddress != null">company_address = #{companyAddress},</if>
+            <if test="attachment != null">attachment = #{attachment},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCustomerById" parameterType="Long">
+        delete from customer where id = #{id}
+    </delete>
+
+    <delete id="deleteCustomerByIds" parameterType="String">
+        delete from customer where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
