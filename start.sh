@@ -1,0 +1,1 @@
+nohup java -Xms512m -Xmx1g -jar /usr/zon/ruoyi-admin/target/ruoyi-admin.jar > app.log 2>&1 &
