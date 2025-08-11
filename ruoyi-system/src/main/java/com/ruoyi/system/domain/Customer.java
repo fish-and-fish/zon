@@ -11,17 +11,17 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 客户信息对象 customer
  * 
  * @author ruoyi
- * @date 2025-08-09
+ * @date 2025-08-10
  */
 public class Customer extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 自增主键ID */
-    private Long id;
+    private String id;
 
-    /** 客户ID */
-    @Excel(name = "客户ID")
+    /** 客户唯一ID（A1国家+公司编号+人员编号） */
+    @Excel(name = "客户唯一ID", readConverterExp = "A=1国家+公司编号+人员编号")
     private String customerId;
 
     /** 公司名称 */
@@ -32,8 +32,8 @@ public class Customer extends BaseEntity
     @Excel(name = "客户名称")
     private String customerName;
 
-    /** 状态类 */
-    @Excel(name = "状态类")
+    /** 状态类（如P2） */
+    @Excel(name = "状态类", readConverterExp = "如=P2")
     private String status;
 
     /** 客户类型 */
@@ -56,9 +56,9 @@ public class Customer extends BaseEntity
     @Excel(name = "客户等级")
     private String customerLevel;
 
-    /** 自动字段 */
+    /** 创建日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "自动字段", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "创建日期", width = 30, dateFormat = "yyyy-MM-dd")
     private Date createdAt;
 
     /** 跟进内容 */
@@ -94,16 +94,16 @@ public class Customer extends BaseEntity
     @Excel(name = "公司地址")
     private String companyAddress;
 
-    /** 附件，存储路径或链接 */
-    @Excel(name = "附件，存储路径或链接")
+    /** 附件路径或链接 */
+    @Excel(name = "附件路径或链接")
     private String attachment;
 
-    public void setId(Long id) 
+    public void setId(String id) 
     {
         this.id = id;
     }
 
-    public Long getId() 
+    public String getId() 
     {
         return id;
     }

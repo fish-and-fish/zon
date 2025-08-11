@@ -7,7 +7,7 @@ import com.ruoyi.system.domain.Customer;
  * 客户信息Service接口
  * 
  * @author ruoyi
- * @date 2025-08-09
+ * @date 2025-08-10
  */
 public interface ICustomerService 
 {
@@ -17,7 +17,7 @@ public interface ICustomerService
      * @param id 客户信息主键
      * @return 客户信息
      */
-    public Customer selectCustomerById(Long id);
+    public Customer selectCustomerById(String id);
 
     /**
      * 查询客户信息列表
@@ -49,7 +49,7 @@ public interface ICustomerService
      * @param ids 需要删除的客户信息主键集合
      * @return 结果
      */
-    public int deleteCustomerByIds(Long[] ids);
+    public int deleteCustomerByIds(String[] ids);
 
     /**
      * 删除客户信息信息
@@ -57,5 +57,5 @@ public interface ICustomerService
      * @param id 客户信息主键
      * @return 结果
      */
-    public int deleteCustomerById(Long id);
+    public int deleteCustomerById(String id);
 }

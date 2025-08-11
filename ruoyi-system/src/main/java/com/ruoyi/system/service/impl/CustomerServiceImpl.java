@@ -11,7 +11,7 @@ import com.ruoyi.system.service.ICustomerService;
  * 客户信息Service业务层处理
  * 
  * @author ruoyi
- * @date 2025-08-09
+ * @date 2025-08-10
  */
 @Service
 public class CustomerServiceImpl implements ICustomerService 
@@ -26,7 +26,7 @@ public class CustomerServiceImpl implements ICustomerService
      * @return 客户信息
      */
     @Override
-    public Customer selectCustomerById(Long id)
+    public Customer selectCustomerById(String id)
     {
         return customerMapper.selectCustomerById(id);
     }
@@ -74,7 +74,7 @@ public class CustomerServiceImpl implements ICustomerService
      * @return 结果
      */
     @Override
-    public int deleteCustomerByIds(Long[] ids)
+    public int deleteCustomerByIds(String[] ids)
     {
         return customerMapper.deleteCustomerByIds(ids);
     }
@@ -86,7 +86,7 @@ public class CustomerServiceImpl implements ICustomerService
      * @return 结果
      */
     @Override
-    public int deleteCustomerById(Long id)
+    public int deleteCustomerById(String id)
     {
         return customerMapper.deleteCustomerById(id);
     }

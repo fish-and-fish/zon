@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.system;
+package com.ruoyi.system.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +25,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * 客户信息Controller
  * 
  * @author ruoyi
- * @date 2025-08-09
+ * @date 2025-08-10
  */
 @RestController
 @RequestMapping("/system/customer")
@@ -64,7 +64,7 @@ public class CustomerController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:customer:query')")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
+    public AjaxResult getInfo(@PathVariable("id") String id)
     {
         return success(customerService.selectCustomerById(id));
     }
@@ -97,7 +97,7 @@ public class CustomerController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:customer:remove')")
     @Log(title = "客户信息", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
+    public AjaxResult remove(@PathVariable String[] ids)
     {
         return toAjax(customerService.deleteCustomerByIds(ids));
     }
