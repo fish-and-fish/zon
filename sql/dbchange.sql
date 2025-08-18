@@ -10,6 +10,3 @@ ADD COLUMN `updateBy` varchar(255) NULL AFTER `createBy`;
 
 ALTER TABLE `ruoyi`.`customer`
 DROP COLUMN `created_at`;
-
-ALTER TABLE `ruoyi`.`customer`
-    MODIFY COLUMN `createUserId` bigint(0) NOT NULL AFTER `attachment`;
