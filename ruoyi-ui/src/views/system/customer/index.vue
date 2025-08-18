@@ -50,7 +50,7 @@
       <!-- 国家地区 下拉框 -->
       <el-form-item label="国家地区" prop="countryRegion">
         <el-select v-model="queryParams.countryRegion" placeholder="请选择国家地区" clearable filterable>
-          <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.name" />
+          <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code" />
         </el-select>
       </el-form-item>
 
@@ -61,14 +61,6 @@
           clearable
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="创建日期" prop="createdAt">
-        <el-date-picker clearable
-                        v-model="queryParams.createdAt"
-                        type="date"
-                        value-format="yyyy-MM-dd"
-                        placeholder="请选择创建日期">
-        </el-date-picker>
       </el-form-item>
       <el-form-item label="跟进日期" prop="followupDate">
         <el-date-picker clearable
@@ -180,7 +172,7 @@
 
     <el-table v-loading="loading" :data="customerList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="自增主键ID" align="center" prop="id" />
+<!--      <el-table-column label="自增主键ID" align="center" prop="id" />-->
       <el-table-column label="客户编号" align="center" prop="customerId" />
       <el-table-column label="公司名称" align="center" prop="companyName" />
       <el-table-column label="客户名称" align="center" prop="customerName" />
@@ -188,19 +180,18 @@
       <el-table-column label="客户类型" align="center" prop="customerType" />
       <el-table-column label="客户来源" align="center" prop="customerSource" />
       <el-table-column label="客户描述" align="center" prop="customerDescription" />
-      <el-table-column label="国家地区" align="center" prop="countryRegion" />
+      <el-table-column label="国家地区" align="center">
+        <template slot-scope="scope">
+          {{ getCountryNameByCode(scope.row.countryRegion) }}
+        </template>
+      </el-table-column>
       <el-table-column label="客户等级" align="center" prop="customerLevel" />
-      <el-table-column label="创建日期" align="center" prop="createdAt" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createdAt, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="跟进内容" align="center" prop="followupContent" />
-      <el-table-column label="跟进日期" align="center" prop="followupDate" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.followupDate, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="跟进内容" align="center" prop="followupContent" />-->
+<!--      <el-table-column label="跟进日期" align="center" prop="followupDate" width="180">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ parseTime(scope.row.followupDate, '{y}-{m}-{d}') }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column label="职位" align="center" prop="position" />
       <el-table-column label="联系电话" align="center" prop="contactPhone" />
       <el-table-column label="邮箱" align="center" prop="email" />
@@ -237,118 +228,116 @@
     />
 
     <!-- 添加或修改客户信息对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="1200px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item label="客户编号" prop="customerId">
-              <el-input v-model="form.customerId" placeholder="A1国家+公司编号+人员编号（示例 A1CN0000101）" />
-            </el-form-item>
-          </el-col>
+<!--          <el-col :span="12">-->
+<!--            <el-form-item label="客户编号" prop="customerId">-->
+<!--              <el-input v-model="form.customerId" placeholder="A1国家+公司编号+人员编号（示例 A1CN0000101）" />-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
           <el-col :span="12">
             <el-form-item label="公司名称" prop="companyName">
               <el-input v-model="form.companyName" placeholder="请输入公司名称" />
             </el-form-item>
           </el-col>
-        </el-row>
-
-        <el-row :gutter="12">
           <el-col :span="12">
             <el-form-item label="客户名称" prop="customerName">
               <el-input v-model="form.customerName" placeholder="请输入客户名称" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+        </el-row>
+
+        <el-row :gutter="12">
+          <el-col :span="6">
             <el-form-item label="状态类" prop="status">
               <el-select v-model="form.status" placeholder="请选择状态类">
                 <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>
-
-        <el-row :gutter="12">
-          <el-col :span="12">
+          <el-col :span="6">
             <el-form-item label="客户类型" prop="customerType">
               <el-select v-model="form.customerType" placeholder="请选择客户类型">
                 <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="6">
             <el-form-item label="客户来源" prop="customerSource">
               <el-select v-model="form.customerSource" placeholder="请选择客户来源">
                 <el-option v-for="opt in customerSourceOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="6">
+            <el-form-item label="国家地区" prop="countryRegion">
+              <el-select v-model="form.countryRegion" placeholder="请选择国家地区" filterable>
+                <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code" />
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
-
-        <el-form-item label="国家地区" prop="countryRegion">
-          <el-select v-model="form.countryRegion" placeholder="请选择国家地区" filterable>
-            <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.name" />
-          </el-select>
-        </el-form-item>
 
         <el-form-item label="客户描述" prop="customerDescription">
           <el-input v-model="form.customerDescription" type="textarea" placeholder="请输入内容" />
         </el-form-item>
+        <el-form-item label="跟进记录">
+          <el-table :data="form.followups" border style="width: 100%">
+            <el-table-column label="跟进内容" align="center">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.content" placeholder="请输入跟进内容"></el-input>
+              </template>
+            </el-table-column>
 
+            <el-table-column label="跟进时间" align="center" width="200">
+              <template slot-scope="scope">
+                <el-date-picker
+                  v-model="scope.row.date"
+                  type="datetime"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  placeholder="选择时间">
+                </el-date-picker>
+              </template>
+            </el-table-column>
 
-        <!-- 客户等级 -->
+            <el-table-column label="操作" align="center" width="120">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" @click="removeFollowup(scope.$index)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <el-button type="primary" size="mini" @click="addFollowup" style="margin-top: 10px;">
+            新增跟进
+          </el-button>
+        </el-form-item>
+
         <el-row :gutter="12">
           <el-col :span="12">
             <el-form-item label="客户等级" prop="customerLevel">
               <el-input v-model="form.customerLevel" placeholder="请输入客户等级" />
             </el-form-item>
           </el-col>
-        </el-row>
-
-        <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item label="创建日期" prop="createdAt">
-              <el-date-picker
-                clearable
-                v-model="form.createdAt"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择创建日期">
-              </el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="跟进内容">
-          <editor v-model="form.followupContent" :min-height="140"/>
-        </el-form-item>
-        <el-form-item label="跟进日期" prop="followupDate">
-          <el-date-picker clearable
-                          v-model="form.followupDate"
-                          type="date"
-                          value-format="yyyy-MM-dd"
-                          placeholder="请选择跟进日期">
-          </el-date-picker>
-        </el-form-item>
-
-        <el-row :gutter="12">
           <el-col :span="12">
             <el-form-item label="职位" prop="position">
               <el-input v-model="form.position" placeholder="请输入职位" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+        </el-row>
+
+        <el-row :gutter="12">
+          <el-col :span="8">
             <el-form-item label="联系电话" prop="contactPhone">
               <el-input v-model="form.contactPhone" placeholder="请输入联系电话" />
             </el-form-item>
           </el-col>
-        </el-row>
-
-        <el-row :gutter="12">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="邮箱" prop="email">
               <el-input v-model="form.email" placeholder="请输入邮箱" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="其他联系方式" prop="otherContact">
               <el-input v-model="form.otherContact" placeholder="请输入其他联系方式" />
             </el-form-item>
@@ -363,8 +352,17 @@
           <el-input v-model="form.companyAddress" type="textarea" placeholder="请输入公司地址" />
         </el-form-item>
 
-        <el-form-item label="附件路径或链接" prop="attachment">
-          <el-input v-model="form.attachment" placeholder="请输入附件路径或链接" />
+        <el-form-item label="上传附件" prop="attachment">
+          <el-upload
+            class="upload-demo"
+            action="/dev-api/common/upload"
+          :on-success="handleUploadSuccess"
+          :limit="3"
+          multiple
+          >
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">支持格式：pdf/docx/xlsx/jpg/png，大小≤10MB</div>
+          </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -437,9 +435,8 @@ export default {
         customerDescription: null,
         countryRegion: null,
         customerLevel: null,
-        createdAt: null,
-        followupContent: null,
-        followupDate: null,
+        // followupContent: null,
+        // followupDate: null,
         position: null,
         contactPhone: null,
         email: null,
@@ -461,9 +458,10 @@ export default {
         customerDescription: null,
         countryRegion: null,
         customerLevel: null,
-        createdAt: null,
-        followupContent: null,
-        followupDate: null,
+        // createdAt: null,
+        // followupContent: null,
+        // followupDate: null,
+        followups: [],
         position: null,
         contactPhone: null,
         email: null,
@@ -505,6 +503,24 @@ export default {
     this.getList()
   },
   methods: {
+    // 添加这个方法
+    getCountryNameByCode(code) {
+      const country = this.countryList.find(c => c.code === code);
+      return country ? country.name : code;
+    },
+
+    handleUploadSuccess(response, file, fileList) {
+      this.form.attachment = response.url || (response.data && response.data.url)
+    },
+    addFollowup() {
+      this.form.followups.push({
+        content: '',
+        date: ''
+      })
+    },
+    removeFollowup(index) {
+      this.form.followups.splice(index, 1)
+    },
     // 列表查询
     getList() {
       this.loading = true
@@ -555,9 +571,10 @@ export default {
         customerDescription: null,
         countryRegion: null,
         customerLevel: null,
-        createdAt: null,
-        followupContent: null,
-        followupDate: null,
+        // createdAt: null,
+        // followupContent: null,
+        // followupDate: null,
+        followups: [],
         position: null,
         contactPhone: null,
         email: null,
@@ -597,6 +614,7 @@ export default {
         // 兼容 response.data 或 response
         const data = response && response.data ? response.data : response
         this.form = Object.assign({}, this.form, data)
+        this.form.followups = JSON.parse(data.followupJson)
         this.open = true
         this.title = "修改客户信息"
       }).catch(err => {
@@ -608,6 +626,10 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          const payload = {
+            ...this.form,
+            followups: JSON.stringify(this.form.followups)
+          }
           if (this.form.id != null) {
             updateCustomer(this.form).then(() => {
               this.$modal && this.$modal.msgSuccess && this.$modal.msgSuccess("修改成功")
@@ -680,9 +702,10 @@ export default {
         customerDescription: null,
         countryRegion: null,
         customerLevel: null,
-        createdAt: null,
-        followupContent: null,
-        followupDate: null,
+        // createdAt: null,
+        // followupContent: null,
+        // followupDate: null,
+        followups: [],
         position: null,
         contactPhone: null,
         email: null,

@@ -1,7 +1,9 @@
-package com.ruoyi.system.controller;
+package com.ruoyi.web.controller.system;
 
 import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +14,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.Customer;
 import com.ruoyi.system.service.ICustomerService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -23,14 +28,13 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 客户信息Controller
- * 
+ *
  * @author ruoyi
  * @date 2025-08-10
  */
 @RestController
 @RequestMapping("/system/customer")
-public class CustomerController extends BaseController
-{
+public class CustomerController extends BaseController {
     @Autowired
     private ICustomerService customerService;
 
@@ -39,9 +43,12 @@ public class CustomerController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:customer:list')")
     @GetMapping("/list")
-    public TableDataInfo list(Customer customer)
-    {
+    public TableDataInfo list(Customer customer) {
         startPage();
+        if (!getLoginUser().getUser().isAdmin()) {
+            customer.setCreateUserId(getUserId());
+        }
+        customer.setCreateUserId(getUserId());
         List<Customer> list = customerService.selectCustomerList(customer);
         return getDataTable(list);
     }
@@ -52,8 +59,13 @@ public class CustomerController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:customer:export')")
     @Log(title = "客户信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, Customer customer)
-    {
+    public void export(HttpServletResponse response, Customer customer) {
+        if(customer != null){
+            throw new ServiceException(StringUtils.format("不支持导出"));
+        }
+        if (!getLoginUser().getUser().isAdmin()) {
+            customer.setCreateUserId(getUserId());
+        }
         List<Customer> list = customerService.selectCustomerList(customer);
         ExcelUtil<Customer> util = new ExcelUtil<Customer>(Customer.class);
         util.exportExcel(response, list, "客户信息数据");
@@ -64,8 +76,7 @@ public class CustomerController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:customer:query')")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") String id)
-    {
+    public AjaxResult getInfo(@PathVariable("id") String id) {
         return success(customerService.selectCustomerById(id));
     }
 
@@ -75,8 +86,8 @@ public class CustomerController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:customer:add')")
     @Log(title = "客户信息", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody Customer customer)
-    {
+    public AjaxResult add(@RequestBody Customer customer) {
+        customer.setCreateUserId(getUserId());
         return toAjax(customerService.insertCustomer(customer));
     }
 
@@ -86,8 +97,7 @@ public class CustomerController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:customer:edit')")
     @Log(title = "客户信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody Customer customer)
-    {
+    public AjaxResult edit(@RequestBody Customer customer) {
         return toAjax(customerService.updateCustomer(customer));
     }
 
@@ -96,9 +106,11 @@ public class CustomerController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:customer:remove')")
     @Log(title = "客户信息", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable String[] ids)
-    {
+    @DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable String[] ids) throws Exception {
+        if (ids.length > 0) {
+            throw new ServiceException(StringUtils.format("不支持删除"));
+        }
         return toAjax(customerService.deleteCustomerByIds(ids));
     }
 }

@@ -1,6 +1,9 @@
 package com.ruoyi.system.domain;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -18,7 +21,10 @@ public class Customer extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 自增主键ID */
-    private String id;
+    private Long id;
+
+    /** 创建者 */
+    private Long createUserId;
 
     /** 客户唯一ID（A1国家+公司编号+人员编号） */
     @Excel(name = "客户唯一ID", readConverterExp = "A=1国家+公司编号+人员编号")
@@ -56,11 +62,6 @@ public class Customer extends BaseEntity
     @Excel(name = "客户等级")
     private String customerLevel;
 
-    /** 创建日期 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "创建日期", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date createdAt;
-
     /** 跟进内容 */
     @Excel(name = "跟进内容")
     private String followupContent;
@@ -69,6 +70,10 @@ public class Customer extends BaseEntity
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "跟进日期", width = 30, dateFormat = "yyyy-MM-dd")
     private Date followupDate;
+
+    private String followupJson;
+
+    private List followups;
 
     /** 职位 */
     @Excel(name = "职位")
@@ -98,12 +103,12 @@ public class Customer extends BaseEntity
     @Excel(name = "附件路径或链接")
     private String attachment;
 
-    public void setId(String id) 
+    public void setId(Long id)
     {
         this.id = id;
     }
 
-    public String getId() 
+    public Long getId()
     {
         return id;
     }
@@ -196,16 +201,6 @@ public class Customer extends BaseEntity
     public String getCustomerLevel() 
     {
         return customerLevel;
-    }
-
-    public void setCreatedAt(Date createdAt) 
-    {
-        this.createdAt = createdAt;
-    }
-
-    public Date getCreatedAt() 
-    {
-        return createdAt;
     }
 
     public void setFollowupContent(String followupContent) 
@@ -311,7 +306,6 @@ public class Customer extends BaseEntity
             .append("customerDescription", getCustomerDescription())
             .append("countryRegion", getCountryRegion())
             .append("customerLevel", getCustomerLevel())
-            .append("createdAt", getCreatedAt())
             .append("followupContent", getFollowupContent())
             .append("followupDate", getFollowupDate())
             .append("position", getPosition())
@@ -322,5 +316,29 @@ public class Customer extends BaseEntity
             .append("companyAddress", getCompanyAddress())
             .append("attachment", getAttachment())
             .toString();
+    }
+
+    public void setFollowupJson(String jsonString) {
+        this.followupJson = jsonString;
+    }
+
+    public String getFollowupJson() {
+        return followupJson;
+    }
+
+    public List getFollowups() {
+        return followups;
+    }
+
+    public void setFollowups(List followups) {
+        this.followups = followups;
+    }
+
+    public Long getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(Long createUserId) {
+        this.createUserId = createUserId;
     }
 }

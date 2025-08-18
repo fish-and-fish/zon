@@ -21,7 +21,6 @@ public class BaseEntity implements Serializable
     @JsonIgnore
     private String searchValue;
 
-    /** 创建者 */
     private String createBy;
 
     /** 创建时间 */

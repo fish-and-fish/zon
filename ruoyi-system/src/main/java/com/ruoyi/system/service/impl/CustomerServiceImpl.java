@@ -3,6 +3,8 @@ package com.ruoyi.system.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson2.JSON;
 import com.ruoyi.system.mapper.CustomerMapper;
 import com.ruoyi.system.domain.Customer;
 import com.ruoyi.system.service.ICustomerService;
@@ -50,8 +52,10 @@ public class CustomerServiceImpl implements ICustomerService
      * @return 结果
      */
     @Override
-    public int insertCustomer(Customer customer)
-    {
+    public int insertCustomer(Customer customer){
+        customer.setFollowupJson(JSON.toJSONString(customer.getFollowups()));
+        String customerId = customer.getCountryRegion() + customer.getCompanyName() + customer.getCreateUserId();
+        customer.setCustomerId(customerId);
         return customerMapper.insertCustomer(customer);
     }
 
@@ -64,6 +68,9 @@ public class CustomerServiceImpl implements ICustomerService
     @Override
     public int updateCustomer(Customer customer)
     {
+        customer.setFollowupJson(JSON.toJSONString(customer.getFollowups()));
+        String customerId = customer.getCountryRegion() + customer.getCompanyName() + "";
+        customer.setCustomerId(customerId);
         return customerMapper.updateCustomer(customer);
     }
 
