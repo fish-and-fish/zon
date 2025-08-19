@@ -68,7 +68,7 @@ public class CustomerServiceImpl implements ICustomerService
         customer1.setCountryRegion(customer.getCountryRegion());
         Integer size = customerMapper.selectCustomerList(customer1).size();
         size ++;
-        String customerId = customer.getCountryRegion() + getCode(company1.getId().intValue(), 6) + getCode(size, 3);
+        String customerId = customer.getCountryRegion() + getCode(company1.getId().intValue(), 5) + getCode(size, 2);
         customer.setCustomerId(customerId);
         return customerMapper.insertCustomer(customer);
     }
