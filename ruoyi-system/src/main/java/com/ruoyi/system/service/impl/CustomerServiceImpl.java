@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
+import com.ruoyi.system.domain.Company;
+import com.ruoyi.system.mapper.CompanyMapper;
 import com.ruoyi.system.mapper.CustomerMapper;
 import com.ruoyi.system.domain.Customer;
 import com.ruoyi.system.service.ICustomerService;
@@ -20,6 +22,8 @@ public class CustomerServiceImpl implements ICustomerService
 {
     @Autowired
     private CustomerMapper customerMapper;
+    @Autowired
+    private CompanyMapper companyMapper;
 
     /**
      * 查询客户信息
@@ -54,9 +58,26 @@ public class CustomerServiceImpl implements ICustomerService
     @Override
     public int insertCustomer(Customer customer){
         customer.setFollowupJson(JSON.toJSONString(customer.getFollowups()));
-        String customerId = customer.getCountryRegion() + customer.getCompanyName() + customer.getCreateUserId();
+        Company company = new Company();
+        company.setCompanyName(customer.getCompanyName());
+        companyMapper.insertCompany(company);
+        Company company1 = companyMapper.selectCompanyList(company).get(0);
+
+        Customer customer1 = new Customer();
+        customer1.setCompanyName(customer.getCompanyName());
+        customer1.setCountryRegion(customer.getCountryRegion());
+        Integer size = customerMapper.selectCustomerList(customer1).size();
+        size ++;
+        String customerId = customer.getCountryRegion() + getCode(company1.getId().intValue(), 6) + getCode(size, 3);
         customer.setCustomerId(customerId);
         return customerMapper.insertCustomer(customer);
+    }
+
+    public String getCode(Integer id, Integer len) {
+        if (id == null || len == null || len <= 0) {
+            throw new IllegalArgumentException("id 和 len 不能为空，且 len 必须大于 0");
+        }
+        return String.format("%0" + len + "d", id);
     }
 
     /**
