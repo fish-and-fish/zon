@@ -60,7 +60,7 @@ public class CustomerController extends BaseController {
     @Log(title = "客户信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, Customer customer) {
-        if(customer != null){
+        if (!getLoginUser().getUser().isAdmin()) {
             throw new ServiceException(StringUtils.format("不支持导出"));
         }
         if (!getLoginUser().getUser().isAdmin()) {
@@ -108,7 +108,7 @@ public class CustomerController extends BaseController {
     @Log(title = "客户信息", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids) throws Exception {
-        if (ids.length > 0) {
+        if (!getLoginUser().getUser().isAdmin()) {
             throw new ServiceException(StringUtils.format("不支持删除"));
         }
         return toAjax(customerService.deleteCustomerByIds(ids));
