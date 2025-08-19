@@ -90,8 +90,6 @@ public class CustomerServiceImpl implements ICustomerService
     public int updateCustomer(Customer customer)
     {
         customer.setFollowupJson(JSON.toJSONString(customer.getFollowups()));
-        String customerId = customer.getCountryRegion() + customer.getCompanyName() + "";
-        customer.setCustomerId(customerId);
         return customerMapper.updateCustomer(customer);
     }
 

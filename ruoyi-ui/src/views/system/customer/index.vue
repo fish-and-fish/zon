@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="客户编号" prop="customerId">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="50px">
+      <el-form-item label="" prop="customerId">
         <el-input
           v-model="queryParams.customerId"
           placeholder="请输入客户编号"
@@ -9,7 +9,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="公司名称" prop="companyName">
+      <el-form-item label="" prop="companyName">
         <el-input
           v-model="queryParams.companyName"
           placeholder="请输入公司名称"
@@ -17,7 +17,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="客户名称" prop="customerName">
+      <el-form-item label="" prop="customerName">
         <el-input
           v-model="queryParams.customerName"
           placeholder="请输入客户名称"
@@ -27,34 +27,34 @@
       </el-form-item>
 
       <!-- 状态类 下拉框 -->
-      <el-form-item label="状态类" prop="status">
+      <el-form-item label="" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态类" clearable>
           <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
       </el-form-item>
 
       <!-- 客户类型 下拉框 -->
-      <el-form-item label="客户类型" prop="customerType">
+      <el-form-item label="" prop="customerType">
         <el-select v-model="queryParams.customerType" placeholder="请选择客户类型" clearable>
           <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
       </el-form-item>
 
       <!-- 客户来源 下拉框 -->
-      <el-form-item label="客户来源" prop="customerSource">
+      <el-form-item label="" prop="customerSource">
         <el-select v-model="queryParams.customerSource" placeholder="请选择客户来源" clearable>
           <el-option v-for="opt in customerSourceOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
       </el-form-item>
 
       <!-- 国家地区 下拉框 -->
-      <el-form-item label="国家地区" prop="countryRegion">
+      <el-form-item label="" prop="countryRegion">
         <el-select v-model="queryParams.countryRegion" placeholder="请选择国家地区" clearable filterable>
-          <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code" />
+          <el-option v-for="c in countryList" :key="c.code" :label="c.en" :value="c.code" />
         </el-select>
       </el-form-item>
 
-      <el-form-item label="客户等级" prop="customerLevel">
+      <el-form-item label="" prop="customerLevel">
         <el-input
           v-model="queryParams.customerLevel"
           placeholder="请输入客户等级"
@@ -62,7 +62,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="跟进日期" prop="followupDate">
+      <el-form-item label="" prop="followupDate">
         <el-date-picker clearable
                         v-model="queryParams.followupDate"
                         type="date"
@@ -70,7 +70,7 @@
                         placeholder="请选择跟进日期">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="职位" prop="position">
+      <el-form-item label="" prop="position">
         <el-input
           v-model="queryParams.position"
           placeholder="请输入职位"
@@ -78,7 +78,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="联系电话" prop="contactPhone">
+      <el-form-item label="" prop="contactPhone">
         <el-input
           v-model="queryParams.contactPhone"
           placeholder="请输入联系电话"
@@ -86,7 +86,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="邮箱" prop="email">
+      <el-form-item label="" prop="email">
         <el-input
           v-model="queryParams.email"
           placeholder="请输入邮箱"
@@ -94,7 +94,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="其他联系方式" prop="otherContact">
+      <el-form-item label="" prop="otherContact">
         <el-input
           v-model="queryParams.otherContact"
           placeholder="请输入其他联系方式"
@@ -102,18 +102,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="公司网站" prop="companyWebsite">
+      <el-form-item label="" prop="companyWebsite">
         <el-input
           v-model="queryParams.companyWebsite"
           placeholder="请输入公司网站"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="附件路径或链接" prop="attachment">
-        <el-input
-          v-model="queryParams.attachment"
-          placeholder="请输入附件路径或链接"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -231,19 +223,21 @@
     <el-dialog :title="title" :visible.sync="open" width="1200px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-row :gutter="12">
-<!--          <el-col :span="12">-->
-<!--            <el-form-item label="客户编号" prop="customerId">-->
-<!--              <el-input v-model="form.customerId" placeholder="A1国家+公司编号+人员编号（示例 A1CN0000101）" />-->
-<!--            </el-form-item>-->
-<!--          </el-col>-->
-          <el-col :span="12">
-            <el-form-item label="公司名称" prop="companyName">
-              <el-input v-model="form.companyName" placeholder="请输入公司名称" />
+          <el-col :span="6">
+            <el-form-item label="国家地区" prop="countryRegion">
+              <el-select v-model="form.countryRegion" placeholder="请选择国家地区" filterable :disabled="isEdit">
+                <el-option v-for="c in countryList" :key="c.code" :label="c.en" :value="c.code" />
+              </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="9">
+            <el-form-item label="公司名称" prop="companyName">
+              <el-input v-model="form.companyName" placeholder="请输入公司名称" :disabled="isEdit" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="9">
             <el-form-item label="客户名称" prop="customerName">
-              <el-input v-model="form.customerName" placeholder="请输入客户名称" />
+              <el-input v-model="form.customerName" placeholder="请输入客户名称" :disabled="isEdit" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -256,24 +250,17 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="9">
             <el-form-item label="客户类型" prop="customerType">
               <el-select v-model="form.customerType" placeholder="请选择客户类型">
                 <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="9">
             <el-form-item label="客户来源" prop="customerSource">
               <el-select v-model="form.customerSource" placeholder="请选择客户来源">
                 <el-option v-for="opt in customerSourceOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="国家地区" prop="countryRegion">
-              <el-select v-model="form.countryRegion" placeholder="请选择国家地区" filterable>
-                <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -294,9 +281,9 @@
               <template slot-scope="scope">
                 <el-date-picker
                   v-model="scope.row.date"
-                  type="datetime"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  placeholder="选择时间">
+                  type="date"
+                  value-format="yyyy-MM-dd"
+                  placeholder="选择日期">
                 </el-date-picker>
               </template>
             </el-table-column>
@@ -386,6 +373,7 @@ export default {
       ids: [],
       single: true,
       multiple: true,
+      isEdit: false,
       total: 0,
       customerList: [],
       title: "",
@@ -415,11 +403,74 @@ export default {
         { label: "1688", value: "1688" }
       ],
       countryList: [
-        { code: "CN", name: "中国" },
-        { code: "US", name: "美国" },
-        { code: "GB", name: "英国" },
-        { code: "CA", name: "加拿大" },
-        { code: "AU", name: "澳大利亚" }
+        { code: "AD", en: "Andorra", name: "安道尔" },
+        { code: "AE", en: "United Arab Emirates", name: "阿联酋" },
+        { code: "AF", en: "Afghanistan", name: "阿富汗" },
+        { code: "AG", en: "Antigua & Barbuda", name: "安提瓜和巴布达" },
+        { code: "AI", en: "Anguilla", name: "安圭拉" },
+        { code: "AL", en: "Albania", name: "阿尔巴尼亚" },
+        { code: "AM", en: "Armenia", name: "亚美尼亚" },
+        { code: "AO", en: "Angola", name: "安哥拉" },
+        { code: "AR", en: "Argentina", name: "阿根廷" },
+        { code: "AS", en: "American Samoa", name: "美属萨摩亚" },
+        { code: "AT", en: "Austria", name: "奥地利" },
+        { code: "AU", en: "Australia", name: "澳大利亚" },
+        { code: "AW", en: "Aruba", name: "阿鲁巴" },
+        { code: "AZ", en: "Azerbaijan", name: "阿塞拜疆" },
+        { code: "BA", en: "Bosnia & Herzegovina", name: "波黑" },
+        { code: "BB", en: "Barbados", name: "巴巴多斯" },
+        { code: "BD", en: "Bangladesh", name: "孟加拉" },
+        { code: "BE", en: "Belgium", name: "比利时" },
+        { code: "BF", en: "Burkina Faso", name: "布基纳法索" },
+        { code: "BG", en: "Bulgaria", name: "保加利亚" },
+        { code: "BH", en: "Bahrain", name: "巴林" },
+        { code: "BI", en: "Burundi", name: "布隆迪" },
+        { code: "BJ", en: "Benin", name: "贝宁" },
+        { code: "BN", en: "Brunei", name: "文莱" },
+        { code: "BO", en: "Bolivia", name: "玻利维亚" },
+        { code: "BR", en: "Brazil", name: "巴西" },
+        { code: "BS", en: "The Bahamas", name: "巴哈马" },
+        { code: "BT", en: "Bhutan", name: "不丹" },
+        { code: "BW", en: "Botswana", name: "博茨瓦纳" },
+        { code: "BY", en: "Belarus", name: "白俄罗斯" },
+        { code: "BZ", en: "Belize", name: "伯利兹" },
+        { code: "CA", en: "Canada", name: "加拿大" },
+        { code: "CH", en: "Switzerland", name: "瑞士" },
+        { code: "CL", en: "Chile", name: "智利" },
+        { code: "CM", en: "Cameroon", name: "喀麦隆" },
+        { code: "CN", en: "China", name: "中国内地" },
+        { code: "CO", en: "Colombia", name: "哥伦比亚" },
+        { code: "CR", en: "Costa Rica", name: "哥斯达黎加" },
+        { code: "CU", en: "Cuba", name: "古巴" },
+        { code: "CY", en: "Cyprus", name: "塞浦路斯" },
+        { code: "CZ", en: "Czech Republic", name: "捷克" },
+        { code: "DE", en: "Germany", name: "德国" },
+        { code: "DK", en: "Denmark", name: "丹麦" },
+        { code: "DO", en: "Dominican Republic", name: "多米尼加" },
+        { code: "DZ", en: "Algeria", name: "阿尔及利亚" },
+        { code: "EC", en: "Ecuador", name: "厄瓜多尔" },
+        { code: "EE", en: "Estonia", name: "爱沙尼亚" },
+        { code: "EG", en: "Egypt", name: "埃及" },
+        { code: "ES", en: "Spain", name: "西班牙" },
+        { code: "FI", en: "Finland", name: "芬兰" },
+        { code: "FJ", en: "Fiji", name: "斐济" },
+        { code: "FR", en: "France", name: "法国" },
+        { code: "GB", en: "United Kingdom", name: "英国" },
+        { code: "GE", en: "Georgia", name: "格鲁吉亚" },
+        { code: "GH", en: "Ghana", name: "加纳" },
+        { code: "GR", en: "Greece", name: "希腊" },
+        { code: "HK", en: "Hong Kong", name: "中国香港" },
+        { code: "IN", en: "India", name: "印度" },
+        { code: "JP", en: "Japan", name: "日本" },
+        { code: "KR", en: "South Korea", name: "韩国" },
+        { code: "MO", en: "Macao", name: "中国澳门" },
+        { code: "RU", en: "Russia", name: "俄罗斯" },
+        { code: "SG", en: "Singapore", name: "新加坡" },
+        { code: "TW", en: "Taiwan", name: "中国台湾" },
+        { code: "US", en: "United States of America", name: "美国" },
+        { code: "VN", en: "Vietnam", name: "越南" },
+        { code: "ZA", en: "South Africa", name: "南非" },
+        { code: "ZW", en: "Zimbabwe", name: "津巴布韦" }
       ],
 
       // 查询参数
@@ -506,7 +557,7 @@ export default {
     // 添加这个方法
     getCountryNameByCode(code) {
       const country = this.countryList.find(c => c.code === code);
-      return country ? country.name : code;
+      return country ? country.en : code;
     },
 
     handleUploadSuccess(response, file, fileList) {
@@ -595,14 +646,15 @@ export default {
       this.multiple = selection.length === 0
     },
 
-    // 新增
+// 新增
     handleAdd() {
       this.reset()
       this.open = true
       this.title = "添加客户信息"
+      this.isEdit = false   // 新增模式下可编辑
     },
 
-    // 修改
+// 修改
     handleUpdate(row) {
       this.reset()
       const id = (row && row.id) ? row.id : (Array.isArray(this.ids) && this.ids.length === 1 ? this.ids[0] : null)
@@ -611,12 +663,12 @@ export default {
         return
       }
       getCustomer(id).then(response => {
-        // 兼容 response.data 或 response
         const data = response && response.data ? response.data : response
         this.form = Object.assign({}, this.form, data)
         this.form.followups = JSON.parse(data.followupJson)
         this.open = true
         this.title = "修改客户信息"
+        this.isEdit = true   // 编辑模式下锁定字段
       }).catch(err => {
         console.error("getCustomer error", err)
       })
