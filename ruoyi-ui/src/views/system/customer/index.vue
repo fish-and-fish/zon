@@ -224,7 +224,34 @@
       <el-table-column label="邮箱" align="center" prop="email"/>
       <el-table-column label="其他联系方式" align="center" prop="otherContact"/>
       <el-table-column label="公司网站" align="center" prop="companyWebsite"/>
-      <el-table-column label="公司地址" align="center" prop="companyAddress"/>
+      <el-table-column
+        label="公司地址"
+        align="center"
+        prop="companyAddress"
+        min-width="400"
+        show-overflow-tooltip>
+        <template slot-scope="scope">
+    <span
+      class="desc-cell"
+      @click="openDescDialog(scope.row.companyAddress)"
+      style="cursor: pointer; color: #409EFF;"
+    >
+      {{ scope.row.companyAddress }}
+    </span>
+        </template>
+      </el-table-column>
+
+      <el-dialog
+        title="公司地址详情"
+        :visible.sync="descDialogVisible"
+        width="60%"
+        center
+        class="desc-dialog"
+      >
+        <div class="desc-content">
+          {{ descDialogContent }}
+        </div>
+      </el-dialog>
       <el-table-column label="附件路径或链接" align="center" prop="attachment"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -418,7 +445,8 @@ export default {
       open: false,
       descDialogVisible: false,
       descDialogContent: "",
-
+      addressDialogVisible: false,  // 新增
+      addressDialogContent: "",     // 新增
       // 下拉选项（可以根据需要改为从后端拉取）
       statusOptions: [
         {label: "活跃P2", value: "P2"},      // 注意：实际存储值我这里用 "P2"
@@ -780,7 +808,7 @@ export default {
 }
 
 .desc-dialog .el-dialog {
-  max-width: 800px; /* 最大宽度限制 */
+  max-width: 400px; /* 最大宽度限制 */
   width: 60%;     /* 基础宽度 */
 }
 .desc-content {
