@@ -169,16 +169,16 @@
     <el-table v-loading="loading" :data="customerList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <!--      <el-table-column label="自增主键ID" align="center" prop="id" />-->
-      <el-table-column label="客户编号" align="center" prop="customerId"/>
-      <el-table-column label="公司名称" align="center" prop="companyName"/>
-      <el-table-column label="客户名称" align="center" prop="customerName"/>
+      <el-table-column label="客户编号" align="center" prop="customerId" width="100px"/>
+      <el-table-column label="公司名称" align="center" prop="companyName" width="140px"/>
+      <el-table-column label="客户名称" align="center" prop="customerName" width="120px"/>
       <el-table-column label="状态类" align="center">
         <template slot-scope="scope">
           {{ getStatusNameByValue(scope.row.status) }}
         </template>
       </el-table-column>
       <el-table-column label="客户类型" align="center" prop="customerType"/>
-      <el-table-column label="客户来源" align="center" prop="customerSource"/>
+      <el-table-column label="客户来源" align="center" prop="customerSource" width="100px"/>
       <el-table-column
         label="客户描述"
         align="center"
@@ -220,10 +220,10 @@
       <!--        </template>-->
       <!--      </el-table-column>-->
       <el-table-column label="职位" align="center" prop="position"/>
-      <el-table-column label="联系电话" align="center" prop="contactPhone"/>
-      <el-table-column label="邮箱" align="center" prop="email"/>
-      <el-table-column label="其他联系方式" align="center" prop="otherContact"/>
-      <el-table-column label="公司网站" align="center" prop="companyWebsite"/>
+      <el-table-column label="联系电话" align="center" prop="contactPhone" width="100px" />
+      <el-table-column label="邮箱" align="center" prop="email" width="100px" />
+      <el-table-column label="其他联系方式" align="center" prop="otherContact" width="120px" />
+      <el-table-column label="公司网站" align="center" prop="companyWebsite" width="100px" />
       <el-table-column
         label="公司地址"
         align="center"
