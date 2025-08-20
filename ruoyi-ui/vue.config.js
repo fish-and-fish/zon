@@ -46,6 +46,11 @@ module.exports = {
       '^/v3/api-docs/(.*)': {
         target: baseUrl,
         changeOrigin: true
+      },
+      '/dev-api': {
+        target: 'http://localhost:9937',
+        changeOrigin: true,
+        pathRewrite: { '^/dev-api': '' } // 将 /dev-api 去掉
       }
     },
     disableHostCheck: true

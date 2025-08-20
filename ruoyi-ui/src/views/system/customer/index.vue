@@ -50,7 +50,7 @@
       <!-- 国家地区 下拉框 -->
       <el-form-item label="" prop="countryRegion">
         <el-select v-model="queryParams.countryRegion" placeholder="请选择国家地区" clearable filterable>
-          <el-option v-for="c in countryList" :key="c.code" :label="c.en" :value="c.code" />
+          <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code" />
         </el-select>
       </el-form-item>
 
@@ -226,7 +226,7 @@
           <el-col :span="6">
             <el-form-item label="国家地区" prop="countryRegion">
               <el-select v-model="form.countryRegion" placeholder="请选择国家地区" filterable :disabled="isEdit">
-                <el-option v-for="c in countryList" :key="c.code" :label="c.en" :value="c.code" />
+                <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -342,7 +342,7 @@
         <el-form-item label="上传附件" prop="attachment">
           <el-upload
             class="upload-demo"
-            action="/dev-api/common/upload"
+            action="http://localhost:9937/common/upload"
           :on-success="handleUploadSuccess"
           :limit="3"
           multiple
@@ -362,6 +362,7 @@
 
 <script>
 import { listCustomer, getCustomer, delCustomer, addCustomer, updateCustomer } from "@/api/system/customer"
+import countryList from "@/utils/dict/CountryList";
 
 export default {
   name: "Customer",
@@ -402,77 +403,7 @@ export default {
         { label: "Tiktok", value: "Tiktok" },
         { label: "1688", value: "1688" }
       ],
-      countryList: [
-        { code: "AD", en: "Andorra", name: "安道尔" },
-        { code: "AE", en: "United Arab Emirates", name: "阿联酋" },
-        { code: "AF", en: "Afghanistan", name: "阿富汗" },
-        { code: "AG", en: "Antigua & Barbuda", name: "安提瓜和巴布达" },
-        { code: "AI", en: "Anguilla", name: "安圭拉" },
-        { code: "AL", en: "Albania", name: "阿尔巴尼亚" },
-        { code: "AM", en: "Armenia", name: "亚美尼亚" },
-        { code: "AO", en: "Angola", name: "安哥拉" },
-        { code: "AR", en: "Argentina", name: "阿根廷" },
-        { code: "AS", en: "American Samoa", name: "美属萨摩亚" },
-        { code: "AT", en: "Austria", name: "奥地利" },
-        { code: "AU", en: "Australia", name: "澳大利亚" },
-        { code: "AW", en: "Aruba", name: "阿鲁巴" },
-        { code: "AZ", en: "Azerbaijan", name: "阿塞拜疆" },
-        { code: "BA", en: "Bosnia & Herzegovina", name: "波黑" },
-        { code: "BB", en: "Barbados", name: "巴巴多斯" },
-        { code: "BD", en: "Bangladesh", name: "孟加拉" },
-        { code: "BE", en: "Belgium", name: "比利时" },
-        { code: "BF", en: "Burkina Faso", name: "布基纳法索" },
-        { code: "BG", en: "Bulgaria", name: "保加利亚" },
-        { code: "BH", en: "Bahrain", name: "巴林" },
-        { code: "BI", en: "Burundi", name: "布隆迪" },
-        { code: "BJ", en: "Benin", name: "贝宁" },
-        { code: "BN", en: "Brunei", name: "文莱" },
-        { code: "BO", en: "Bolivia", name: "玻利维亚" },
-        { code: "BR", en: "Brazil", name: "巴西" },
-        { code: "BS", en: "The Bahamas", name: "巴哈马" },
-        { code: "BT", en: "Bhutan", name: "不丹" },
-        { code: "BW", en: "Botswana", name: "博茨瓦纳" },
-        { code: "BY", en: "Belarus", name: "白俄罗斯" },
-        { code: "BZ", en: "Belize", name: "伯利兹" },
-        { code: "CA", en: "Canada", name: "加拿大" },
-        { code: "CH", en: "Switzerland", name: "瑞士" },
-        { code: "CL", en: "Chile", name: "智利" },
-        { code: "CM", en: "Cameroon", name: "喀麦隆" },
-        { code: "CN", en: "China", name: "中国内地" },
-        { code: "CO", en: "Colombia", name: "哥伦比亚" },
-        { code: "CR", en: "Costa Rica", name: "哥斯达黎加" },
-        { code: "CU", en: "Cuba", name: "古巴" },
-        { code: "CY", en: "Cyprus", name: "塞浦路斯" },
-        { code: "CZ", en: "Czech Republic", name: "捷克" },
-        { code: "DE", en: "Germany", name: "德国" },
-        { code: "DK", en: "Denmark", name: "丹麦" },
-        { code: "DO", en: "Dominican Republic", name: "多米尼加" },
-        { code: "DZ", en: "Algeria", name: "阿尔及利亚" },
-        { code: "EC", en: "Ecuador", name: "厄瓜多尔" },
-        { code: "EE", en: "Estonia", name: "爱沙尼亚" },
-        { code: "EG", en: "Egypt", name: "埃及" },
-        { code: "ES", en: "Spain", name: "西班牙" },
-        { code: "FI", en: "Finland", name: "芬兰" },
-        { code: "FJ", en: "Fiji", name: "斐济" },
-        { code: "FR", en: "France", name: "法国" },
-        { code: "GB", en: "United Kingdom", name: "英国" },
-        { code: "GE", en: "Georgia", name: "格鲁吉亚" },
-        { code: "GH", en: "Ghana", name: "加纳" },
-        { code: "GR", en: "Greece", name: "希腊" },
-        { code: "HK", en: "Hong Kong", name: "中国香港" },
-        { code: "IN", en: "India", name: "印度" },
-        { code: "JP", en: "Japan", name: "日本" },
-        { code: "KR", en: "South Korea", name: "韩国" },
-        { code: "MO", en: "Macao", name: "中国澳门" },
-        { code: "RU", en: "Russia", name: "俄罗斯" },
-        { code: "SG", en: "Singapore", name: "新加坡" },
-        { code: "TW", en: "Taiwan", name: "中国台湾" },
-        { code: "US", en: "United States of America", name: "美国" },
-        { code: "VN", en: "Vietnam", name: "越南" },
-        { code: "ZA", en: "South Africa", name: "南非" },
-        { code: "ZW", en: "Zimbabwe", name: "津巴布韦" }
-      ],
-
+      countryList,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -557,7 +488,7 @@ export default {
     // 添加这个方法
     getCountryNameByCode(code) {
       const country = this.countryList.find(c => c.code === code);
-      return country ? country.en : code;
+      return country ? country.name : code;
     },
 
     handleUploadSuccess(response, file, fileList) {
