@@ -203,9 +203,9 @@
         center
         class="desc-dialog"
       >
-      <div class="desc-content">
-        {{ descDialogContent }}
-      </div>
+        <div class="desc-content">
+          {{ descDialogContent }}
+        </div>
       </el-dialog>
       <el-table-column label="国家地区" align="center">
         <template slot-scope="scope">
@@ -220,10 +220,10 @@
       <!--        </template>-->
       <!--      </el-table-column>-->
       <el-table-column label="职位" align="center" prop="position"/>
-      <el-table-column label="联系电话" align="center" prop="contactPhone" width="100px" />
-      <el-table-column label="邮箱" align="center" prop="email" width="100px" />
-      <el-table-column label="其他联系方式" align="center" prop="otherContact" width="120px" />
-      <el-table-column label="公司网站" align="center" prop="companyWebsite" width="100px" />
+      <el-table-column label="联系电话" align="center" prop="contactPhone" width="100px"/>
+      <el-table-column label="邮箱" align="center" prop="email" width="100px"/>
+      <el-table-column label="其他联系方式" align="center" prop="otherContact" width="120px"/>
+      <el-table-column label="公司网站" align="center" prop="companyWebsite" width="100px"/>
       <el-table-column
         label="公司地址"
         align="center"
@@ -252,7 +252,54 @@
           {{ descDialogContent }}
         </div>
       </el-dialog>
-      <el-table-column label="附件路径或链接" align="center" prop="attachment"/>
+
+      <!-- 文件预览弹窗 -->
+      <el-dialog
+        title="文件预览"
+        :visible.sync="previewDialogVisible"
+        width="80%"
+        center
+        class="preview-dialog"
+      >
+        <div class="preview-content">
+          <div v-if="previewDialogContent">
+            <h4 style="margin-bottom: 20px;">{{ previewDialogContent.originalFilename }}</h4>
+            <template v-if="isImageFile(previewDialogContent.originalFilename)">
+              <img :src="previewDialogContent.url" alt="预览图片" style="max-width: 100%; max-height: 70vh;">
+            </template>
+            <template v-else-if="isPdfFile(previewDialogContent.originalFilename)">
+              <embed :src="previewDialogContent.url" type="application/pdf" style="width: 100%; height: 70vh;">
+            </template>
+            <template v-else>
+              <p>该文件类型无法在线预览，请<a :href="previewDialogContent.url" target="_blank">点击下载</a>后查看。</p>
+            </template>
+            <div style="margin-top: 20px;">
+              <el-button size="small" type="primary" :href="previewDialogContent.url" target="_blank" download>
+                下载文件
+              </el-button>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+
+      <el-table-column label="附件" align="center" width="200px">
+        <template slot-scope="scope">
+          <div v-if="scope.row.attachment">
+            <template v-for="(file, index) in parseAttachment(scope.row.attachment)">
+              <el-link
+                :key="index"
+                :underline="false"
+                @click="openFilePreview(file)"
+                style="cursor: pointer; color: #409EFF; display: block; margin-bottom: 5px;"
+              >
+                {{ file.originalFilename }}
+              </el-link>
+            </template>
+          </div>
+          <span v-else>无附件</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -404,16 +451,14 @@
         </el-form-item>
 
         <el-form-item label="上传附件" prop="attachment">
-          <el-upload
-            class="upload-demo"
-            action="http://localhost:9937/common/upload"
-            :on-success="handleUploadSuccess"
+          <FileUpload
             :limit="3"
-            multiple
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">支持格式：pdf/docx/xlsx/jpg/png，大小≤10MB</div>
-          </el-upload>
+            :fileSize="10"
+            :fileType="['pdf', 'docx', 'xlsx', 'jpg', 'png', 'jpeg']"
+            :disabled="false"
+            @on-success="handleFileUploadSuccess"
+            :uploadFiles="fileAttachments"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -425,10 +470,15 @@
 </template>
 
 <script>
-import {listCustomer, getCustomer, delCustomer, addCustomer, updateCustomer} from "@/api/system/customer"
+import {listCustomer, getCustomer, delCustomer, addCustomer, updateCustomer} from "@/api/system/customer";
 import countryList from "@/utils/dict/CountryList";
+import FileUpload from "@/components/FileUpload/index.vue";
 
 export default {
+  components: {
+    // 注册FileUpload组件
+    FileUpload
+  },
   name: "Customer",
   data() {
     return {
@@ -447,6 +497,10 @@ export default {
       descDialogContent: "",
       addressDialogVisible: false,  // 新增
       addressDialogContent: "",     // 新增
+      // 新增：文件附件数组和预览弹窗状态
+      fileAttachments: [],
+      previewDialogVisible: false,
+      previewDialogContent: null,
       // 下拉选项（可以根据需要改为从后端拉取）
       statusOptions: [
         {label: "活跃P2", value: "P2"},      // 注意：实际存储值我这里用 "P2"
@@ -567,8 +621,24 @@ export default {
       return country ? country.name : code;
     },
 
-    handleUploadSuccess(response, file, fileList) {
-      this.form.attachment = response.url || (response.data && response.data.url)
+    handleFileUploadSuccess(response, file) {
+      // 确保response和file都存在
+      if (response && file) {
+        // 获取文件的URL
+        const fileUrl = response.url || (response.data && response.data.url) || '';
+        if (fileUrl) {
+          // 创建文件对象并添加到fileAttachments数组
+          const fileObj = {
+            url: fileUrl,
+            originalFilename: file.name
+          };
+          // 避免重复添加
+          const isDuplicate = this.fileAttachments.some(item => item.url === fileUrl);
+          if (!isDuplicate) {
+            this.fileAttachments.push(fileObj);
+          }
+        }
+      }
     },
     addFollowup() {
       this.form.followups.push({
@@ -662,52 +732,173 @@ export default {
     },
 
 // 修改
-    handleUpdate(row) {
-      this.reset()
-      const id = (row && row.id) ? row.id : (Array.isArray(this.ids) && this.ids.length === 1 ? this.ids[0] : null)
-      if (!id) {
-        this.$modal && this.$modal.msgWarning && this.$modal.msgWarning("请选择要修改的一条记录")
-        return
+    // 修改handleFileUploadSuccess方法，正确处理上传成功的文件
+    // ... 在methods中找到handleFileUploadSuccess方法，大约在第680行附近
+    handleFileUploadSuccess(response, file) {
+      if (response && file) {
+        // 拿到后端返回的 url
+        const fileUrl = response.url || (response.data && response.data.url) || '';
+        if (fileUrl) {
+          const fileObj = {
+            url: fileUrl,
+            originalFilename: file.name   // 上传时的原始文件名
+          };
+          // 避免重复
+          const isDuplicate = this.fileAttachments.some(item => item.url === fileUrl);
+          if (!isDuplicate) {
+            this.fileAttachments.push(fileObj);
+          }
+        }
       }
-      getCustomer(id).then(response => {
-        const data = response && response.data ? response.data : response
-        this.form = Object.assign({}, this.form, data)
-        this.form.followups = JSON.parse(data.followupJson)
-        this.open = true
-        this.title = "修改客户信息"
-        this.isEdit = true   // 编辑模式下锁定字段
+    },
+    addFollowup() {
+      this.form.followups.push({
+        content: '',
+        date: ''
+      })
+    },
+    removeFollowup(index) {
+      this.form.followups.splice(index, 1)
+    },
+    // 列表查询
+    getList() {
+      this.loading = true
+      listCustomer(this.queryParams).then(response => {
+        // 兼容不同返回格式
+        if (response && response.rows) {
+          this.customerList = response.rows
+          this.total = response.total || (response.rows.length)
+        } else if (response && response.data) {
+          // 如果后端返回 { data: { rows, total } }
+          this.customerList = response.data.rows || []
+          this.total = response.data.total || this.customerList.length
+        } else {
+          this.customerList = []
+          this.total = 0
+        }
       }).catch(err => {
-        console.error("getCustomer error", err)
+        console.error("listCustomer error", err)
+        this.customerList = []
+        this.total = 0
+      }).finally(() => {
+        this.loading = false
       })
     },
 
-    // 提交新增/更新
+    // 搜索
+    handleQuery() {
+      this.queryParams.pageNum = 1
+      this.getList()
+    },
+
+    cancel() {
+      this.open = false
+    },
+
+    // 重置查询
+    resetQuery() {
+      // 重置 queryParams 到初始值
+      this.queryParams = {
+        pageNum: 1,
+        pageSize: 10,
+        customerId: null,
+        companyName: null,
+        customerName: null,
+        status: null,
+        customerType: null,
+        customerSource: null,
+        customerDescription: null,
+        countryRegion: null,
+        customerLevel: null,
+        // createdAt: null,
+        // followupContent: null,
+        // followupDate: null,
+        followups: [],
+        position: null,
+        contactPhone: null,
+        email: null,
+        otherContact: null,
+        companyWebsite: null,
+        companyAddress: null,
+        attachment: null
+      }
+      // 如果有 queryForm 引用，重置表单控件状态
+      this.resetForm("queryForm")
+      this.getList()
+    },
+
+    // 选择变更
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.id)
+      this.single = selection.length !== 1
+      this.multiple = selection.length === 0
+    },
+
+// 新增
+    handleAdd() {
+      this.reset()
+      this.open = true
+      this.title = "添加客户信息"
+      this.isEdit = false   // 新增模式下可编辑
+    },
+
+// 修改
+// 修改handleUpdate方法，正确处理编辑时的附件数据
+    handleUpdate(row) {
+      this.reset();
+      const id = row.id;
+      getCustomer(id).then(response => {
+        const data = response.data;
+        this.form = Object.assign({}, this.form, data);
+        this.form.followups = JSON.parse(data.followupJson || "[]");
+
+        // 回显附件
+        if (data.attachment) {
+          try {
+            const attachments = JSON.parse(data.attachment);
+            if (Array.isArray(attachments)) {
+              this.fileAttachments = attachments; // [{"url":"...","originalFilename":"..."}]
+            } else {
+              this.fileAttachments = [attachments];
+            }
+          } catch (e) {
+            // 如果解析失败，说明是旧格式
+            this.fileAttachments = [{url: data.attachment, originalFilename: data.attachment.split('/').pop()}];
+          }
+        }
+        this.open = true;
+        this.title = "修改客户信息";
+        this.isEdit = true;
+      });
+    },
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          // 把附件存为 JSON 数组
+          this.form.attachment = this.fileAttachments.length > 0
+            ? JSON.stringify(this.fileAttachments)
+            : null;
+
           const payload = {
             ...this.form,
-            followups: JSON.stringify(this.form.followups)
-          }
+            followupJson: JSON.stringify(this.form.followups)
+          };
+
           if (this.form.id != null) {
-            updateCustomer(this.form).then(() => {
-              this.$modal && this.$modal.msgSuccess && this.$modal.msgSuccess("修改成功")
-              this.open = false
-              this.getList()
-            }).catch(err => {
-              console.error("updateCustomer error", err)
-            })
+            updateCustomer(payload).then(() => {
+              this.$modal.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
+            });
           } else {
-            addCustomer(this.form).then(() => {
-              this.$modal && this.$modal.msgSuccess && this.$modal.msgSuccess("新增成功")
-              this.open = false
-              this.getList()
-            }).catch(err => {
-              console.error("addCustomer error", err)
-            })
+            addCustomer(payload).then(() => {
+              this.$modal.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            });
           }
         }
-      })
+      });
     },
 
     // 删除
@@ -750,6 +941,7 @@ export default {
     },
 
     // 重置新增/编辑表单数据
+    // 修改reset方法，确保重置附件数据
     reset() {
       this.form = {
         id: null,
@@ -762,9 +954,6 @@ export default {
         customerDescription: null,
         countryRegion: null,
         customerLevel: null,
-        // createdAt: null,
-        // followupContent: null,
-        // followupDate: null,
         followups: [],
         position: null,
         contactPhone: null,
@@ -774,6 +963,8 @@ export default {
         companyAddress: null,
         attachment: null
       }
+      // 重置附件相关数据
+      this.fileAttachments = [];
       this.resetForm("form")
     },
 
@@ -789,6 +980,43 @@ export default {
       const m = (date.getMonth() + 1 + '').padStart(2, '0')
       const d = (date.getDate() + '').padStart(2, '0')
       return `${y}-${m}-${d}`
+    },
+
+    // 解析附件数据
+    parseAttachment(attachmentData) {
+      if (!attachmentData) return [];
+      try {
+        const attachments = JSON.parse(attachmentData);
+        if (Array.isArray(attachments)) {
+          return attachments.map(attach => ({
+            url: attach.url,
+            originalFilename: attach.originalFilename || attach.url.split('/').pop()
+          }));
+        } else if (typeof attachments === "object") {
+          return [attachments];
+        } else {
+          return [{url: attachmentData, originalFilename: attachmentData.split('/').pop()}];
+        }
+      } catch {
+        return [{url: attachmentData, originalFilename: attachmentData.split('/').pop()}];
+      }
+    },
+    // 文件预览方法
+    openFilePreview(fileInfo) {
+      this.previewDialogContent = fileInfo;
+      this.previewDialogVisible = true;
+    },
+
+    // 判断是否为图片文件
+    isImageFile(filename) {
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+      const extension = filename.split('.').pop().toLowerCase();
+      return imageExtensions.includes(extension);
+    },
+
+    // 判断是否为PDF文件
+    isPdfFile(filename) {
+      return filename.toLowerCase().endsWith('.pdf');
     }
   }
 }
@@ -809,10 +1037,22 @@ export default {
 
 .desc-dialog .el-dialog {
   max-width: 400px; /* 最大宽度限制 */
-  width: 60%;     /* 基础宽度 */
+  width: 60%; /* 基础宽度 */
 }
+
 .desc-content {
   max-height: 60vh; /* 最大高度限制，防止内容过长 */
+  overflow-y: auto; /* 添加滚动条 */
+  padding: 10px;
+}
+
+.preview-dialog .el-dialog {
+  max-width: 90vw; /* 最大宽度限制 */
+  width: 80%; /* 基础宽度 */
+}
+
+.preview-content {
+  max-height: 70vh; /* 最大高度限制，防止内容过长 */
   overflow-y: auto; /* 添加滚动条 */
   padding: 10px;
 }

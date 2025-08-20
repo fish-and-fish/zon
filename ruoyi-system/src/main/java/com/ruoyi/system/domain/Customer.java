@@ -73,8 +73,6 @@ public class Customer extends BaseEntity
 
     private String followupJson;
 
-    private List followups;
-
     /** 职位 */
     @Excel(name = "职位")
     private String position;
@@ -324,14 +322,6 @@ public class Customer extends BaseEntity
 
     public String getFollowupJson() {
         return followupJson;
-    }
-
-    public List getFollowups() {
-        return followups;
-    }
-
-    public void setFollowups(List followups) {
-        this.followups = followups;
     }
 
     public Long getCreateUserId() {

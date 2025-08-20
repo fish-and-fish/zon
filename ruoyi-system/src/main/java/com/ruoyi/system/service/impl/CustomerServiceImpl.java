@@ -57,7 +57,6 @@ public class CustomerServiceImpl implements ICustomerService
      */
     @Override
     public int insertCustomer(Customer customer){
-        customer.setFollowupJson(JSON.toJSONString(customer.getFollowups()));
         Company company = new Company();
         company.setCompanyName(customer.getCompanyName());
         companyMapper.insertCompany(company);
@@ -89,7 +88,6 @@ public class CustomerServiceImpl implements ICustomerService
     @Override
     public int updateCustomer(Customer customer)
     {
-        customer.setFollowupJson(JSON.toJSONString(customer.getFollowups()));
         return customerMapper.updateCustomer(customer);
     }
 
