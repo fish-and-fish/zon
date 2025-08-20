@@ -29,28 +29,28 @@
       <!-- 状态类 下拉框 -->
       <el-form-item label="" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态类" clearable>
-          <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+          <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
         </el-select>
       </el-form-item>
 
       <!-- 客户类型 下拉框 -->
       <el-form-item label="" prop="customerType">
         <el-select v-model="queryParams.customerType" placeholder="请选择客户类型" clearable>
-          <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+          <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
         </el-select>
       </el-form-item>
 
       <!-- 客户来源 下拉框 -->
       <el-form-item label="" prop="customerSource">
         <el-select v-model="queryParams.customerSource" placeholder="请选择客户来源" clearable>
-          <el-option v-for="opt in customerSourceOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+          <el-option v-for="opt in customerSourceOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
         </el-select>
       </el-form-item>
 
       <!-- 国家地区 下拉框 -->
       <el-form-item label="" prop="countryRegion">
         <el-select v-model="queryParams.countryRegion" placeholder="请选择国家地区" clearable filterable>
-          <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code" />
+          <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code"/>
         </el-select>
       </el-form-item>
 
@@ -125,7 +125,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['system:customer:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -136,7 +137,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['system:customer:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -147,7 +149,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['system:customer:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -157,40 +160,72 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['system:customer:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="customerList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-<!--      <el-table-column label="自增主键ID" align="center" prop="id" />-->
-      <el-table-column label="客户编号" align="center" prop="customerId" />
-      <el-table-column label="公司名称" align="center" prop="companyName" />
-      <el-table-column label="客户名称" align="center" prop="customerName" />
-      <el-table-column label="状态类" align="center" prop="status" />
-      <el-table-column label="客户类型" align="center" prop="customerType" />
-      <el-table-column label="客户来源" align="center" prop="customerSource" />
-      <el-table-column label="客户描述" align="center" prop="customerDescription" />
+      <el-table-column type="selection" width="55" align="center"/>
+      <!--      <el-table-column label="自增主键ID" align="center" prop="id" />-->
+      <el-table-column label="客户编号" align="center" prop="customerId"/>
+      <el-table-column label="公司名称" align="center" prop="companyName"/>
+      <el-table-column label="客户名称" align="center" prop="customerName"/>
+      <el-table-column label="状态类" align="center">
+        <template slot-scope="scope">
+          {{ getStatusNameByValue(scope.row.status) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="客户类型" align="center" prop="customerType"/>
+      <el-table-column label="客户来源" align="center" prop="customerSource"/>
+      <el-table-column
+        label="客户描述"
+        align="center"
+        prop="customerDescription"
+        min-width="300"
+        show-overflow-tooltip>
+        <template slot-scope="scope">
+    <span
+      class="desc-cell"
+      @click="openDescDialog(scope.row.customerDescription)"
+      style="cursor: pointer; color: #409EFF;"
+    >
+      {{ scope.row.customerDescription }}
+    </span>
+        </template>
+      </el-table-column>
+
+      <el-dialog
+        title="客户描述详情"
+        :visible.sync="descDialogVisible"
+        width="60%"
+        center
+        class="desc-dialog"
+      >
+      <div class="desc-content">
+        {{ descDialogContent }}
+      </div>
+      </el-dialog>
       <el-table-column label="国家地区" align="center">
         <template slot-scope="scope">
           {{ getCountryNameByCode(scope.row.countryRegion) }}
         </template>
       </el-table-column>
-      <el-table-column label="客户等级" align="center" prop="customerLevel" />
-<!--      <el-table-column label="跟进内容" align="center" prop="followupContent" />-->
-<!--      <el-table-column label="跟进日期" align="center" prop="followupDate" width="180">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ parseTime(scope.row.followupDate, '{y}-{m}-{d}') }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-      <el-table-column label="职位" align="center" prop="position" />
-      <el-table-column label="联系电话" align="center" prop="contactPhone" />
-      <el-table-column label="邮箱" align="center" prop="email" />
-      <el-table-column label="其他联系方式" align="center" prop="otherContact" />
-      <el-table-column label="公司网站" align="center" prop="companyWebsite" />
-      <el-table-column label="公司地址" align="center" prop="companyAddress" />
-      <el-table-column label="附件路径或链接" align="center" prop="attachment" />
+      <el-table-column label="客户等级" align="center" prop="customerLevel"/>
+      <!--      <el-table-column label="跟进内容" align="center" prop="followupContent" />-->
+      <!--      <el-table-column label="跟进日期" align="center" prop="followupDate" width="180">-->
+      <!--        <template slot-scope="scope">-->
+      <!--          <span>{{ parseTime(scope.row.followupDate, '{y}-{m}-{d}') }}</span>-->
+      <!--        </template>-->
+      <!--      </el-table-column>-->
+      <el-table-column label="职位" align="center" prop="position"/>
+      <el-table-column label="联系电话" align="center" prop="contactPhone"/>
+      <el-table-column label="邮箱" align="center" prop="email"/>
+      <el-table-column label="其他联系方式" align="center" prop="otherContact"/>
+      <el-table-column label="公司网站" align="center" prop="companyWebsite"/>
+      <el-table-column label="公司地址" align="center" prop="companyAddress"/>
+      <el-table-column label="附件路径或链接" align="center" prop="attachment"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -199,14 +234,16 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:customer:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:customer:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -226,18 +263,18 @@
           <el-col :span="6">
             <el-form-item label="国家地区" prop="countryRegion">
               <el-select v-model="form.countryRegion" placeholder="请选择国家地区" filterable :disabled="isEdit">
-                <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code" />
+                <el-option v-for="c in countryList" :key="c.code" :label="c.name" :value="c.code"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="9">
             <el-form-item label="公司名称" prop="companyName">
-              <el-input v-model="form.companyName" placeholder="请输入公司名称" :disabled="isEdit" />
+              <el-input v-model="form.companyName" placeholder="请输入公司名称" :disabled="isEdit"/>
             </el-form-item>
           </el-col>
           <el-col :span="9">
             <el-form-item label="客户名称" prop="customerName">
-              <el-input v-model="form.customerName" placeholder="请输入客户名称" :disabled="isEdit" />
+              <el-input v-model="form.customerName" placeholder="请输入客户名称" :disabled="isEdit"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -246,28 +283,28 @@
           <el-col :span="6">
             <el-form-item label="状态类" prop="status">
               <el-select v-model="form.status" placeholder="请选择状态类">
-                <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+                <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="9">
             <el-form-item label="客户类型" prop="customerType">
               <el-select v-model="form.customerType" placeholder="请选择客户类型">
-                <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+                <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="9">
             <el-form-item label="客户来源" prop="customerSource">
               <el-select v-model="form.customerSource" placeholder="请选择客户来源">
-                <el-option v-for="opt in customerSourceOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+                <el-option v-for="opt in customerSourceOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item label="客户描述" prop="customerDescription">
-          <el-input v-model="form.customerDescription" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.customerDescription" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
         <el-form-item label="跟进记录">
           <el-table :data="form.followups" border style="width: 100%">
@@ -303,12 +340,12 @@
         <el-row :gutter="12">
           <el-col :span="12">
             <el-form-item label="客户等级" prop="customerLevel">
-              <el-input v-model="form.customerLevel" placeholder="请输入客户等级" />
+              <el-input v-model="form.customerLevel" placeholder="请输入客户等级"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="职位" prop="position">
-              <el-input v-model="form.position" placeholder="请输入职位" />
+              <el-input v-model="form.position" placeholder="请输入职位"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -316,39 +353,39 @@
         <el-row :gutter="12">
           <el-col :span="8">
             <el-form-item label="联系电话" prop="contactPhone">
-              <el-input v-model="form.contactPhone" placeholder="请输入联系电话" />
+              <el-input v-model="form.contactPhone" placeholder="请输入联系电话"/>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="邮箱" prop="email">
-              <el-input v-model="form.email" placeholder="请输入邮箱" />
+              <el-input v-model="form.email" placeholder="请输入邮箱"/>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="其他联系方式" prop="otherContact">
-              <el-input v-model="form.otherContact" placeholder="请输入其他联系方式" />
+              <el-input v-model="form.otherContact" placeholder="请输入其他联系方式"/>
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item label="公司网站" prop="companyWebsite">
-          <el-input v-model="form.companyWebsite" placeholder="请输入公司网站" />
+          <el-input v-model="form.companyWebsite" placeholder="请输入公司网站"/>
         </el-form-item>
 
         <el-form-item label="公司地址" prop="companyAddress">
-          <el-input v-model="form.companyAddress" type="textarea" placeholder="请输入公司地址" />
+          <el-input v-model="form.companyAddress" type="textarea" placeholder="请输入公司地址"/>
         </el-form-item>
 
         <el-form-item label="上传附件" prop="attachment">
           <el-upload
             class="upload-demo"
             action="http://localhost:9937/common/upload"
-          :on-success="handleUploadSuccess"
-          :limit="3"
-          multiple
+            :on-success="handleUploadSuccess"
+            :limit="3"
+            multiple
           >
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">支持格式：pdf/docx/xlsx/jpg/png，大小≤10MB</div>
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">支持格式：pdf/docx/xlsx/jpg/png，大小≤10MB</div>
           </el-upload>
         </el-form-item>
       </el-form>
@@ -361,7 +398,7 @@
 </template>
 
 <script>
-import { listCustomer, getCustomer, delCustomer, addCustomer, updateCustomer } from "@/api/system/customer"
+import {listCustomer, getCustomer, delCustomer, addCustomer, updateCustomer} from "@/api/system/customer"
 import countryList from "@/utils/dict/CountryList";
 
 export default {
@@ -379,29 +416,31 @@ export default {
       customerList: [],
       title: "",
       open: false,
+      descDialogVisible: false,
+      descDialogContent: "",
 
       // 下拉选项（可以根据需要改为从后端拉取）
       statusOptions: [
-        { label: "活跃P2", value: "P2" },      // 注意：实际存储值我这里用 "P2"
-        { label: "非活跃", value: "INACTIVE" }
+        {label: "活跃P2", value: "P2"},      // 注意：实际存储值我这里用 "P2"
+        {label: "非活跃", value: "INACTIVE"}
       ],
       customerTypeOptions: [
-        { label: "订单客户", value: "订单客户" },
-        { label: "样单客户", value: "样单客户" },
-        { label: "重潜客户", value: "重潜客户" },
-        { label: "轻潜客户", value: "轻潜客户" },
-        { label: "无潜客户", value: "无潜客户" }
+        {label: "订单客户", value: "订单客户"},
+        {label: "样单客户", value: "样单客户"},
+        {label: "重潜客户", value: "重潜客户"},
+        {label: "轻潜客户", value: "轻潜客户"},
+        {label: "无潜客户", value: "无潜客户"}
       ],
       customerSourceOptions: [
-        { label: "阿里国际站", value: "阿里国际站" },
-        { label: "邮件", value: "邮件" },
-        { label: "公司客户", value: "公司客户" },
-        { label: "展会", value: "展会" },
-        { label: "领英", value: "领英" },
-        { label: "ins", value: "ins" },
-        { label: "Facebook", value: "Facebook" },
-        { label: "Tiktok", value: "Tiktok" },
-        { label: "1688", value: "1688" }
+        {label: "阿里国际站", value: "阿里国际站"},
+        {label: "邮件", value: "邮件"},
+        {label: "公司客户", value: "公司客户"},
+        {label: "展会", value: "展会"},
+        {label: "领英", value: "领英"},
+        {label: "ins", value: "ins"},
+        {label: "Facebook", value: "Facebook"},
+        {label: "Tiktok", value: "Tiktok"},
+        {label: "1688", value: "1688"}
       ],
       countryList,
       // 查询参数
@@ -456,27 +495,27 @@ export default {
       // 表单校验
       rules: {
         customerId: [
-          { required: true, message: "客户编号不能为空", trigger: "blur" },
+          {required: true, message: "客户编号不能为空", trigger: "blur"},
           // 简单格式校验示例（可根据真实规则调整）：A1开头 + 至少后续 6~20 字符
           // { pattern: /^A1[A-Za-z0-9\-_]{6,20}$/, message: "客户ID 格式不正确（示例 A1CN0000101）", trigger: "blur" }
         ],
         companyName: [
-          { required: true, message: "公司名称不能为空", trigger: "blur" }
+          {required: true, message: "公司名称不能为空", trigger: "blur"}
         ],
         customerName: [
-          { required: true, message: "客户名称不能为空", trigger: "blur" }
+          {required: true, message: "客户名称不能为空", trigger: "blur"}
         ],
         status: [
-          { required: true, message: "状态类不能为空", trigger: "change" }
+          {required: true, message: "状态类不能为空", trigger: "change"}
         ],
         customerType: [
-          { required: true, message: "客户类型不能为空", trigger: "change" }
+          {required: true, message: "客户类型不能为空", trigger: "change"}
         ],
         customerSource: [
-          { required: true, message: "客户来源不能为空", trigger: "change" }
+          {required: true, message: "客户来源不能为空", trigger: "change"}
         ],
         countryRegion: [
-          { required: true, message: "国家地区不能为空", trigger: "change" }
+          {required: true, message: "国家地区不能为空", trigger: "change"}
         ]
       }
     }
@@ -485,7 +524,16 @@ export default {
     this.getList()
   },
   methods: {
+    openDescDialog(content) {
+      this.descDialogContent = content;
+      this.descDialogVisible = true;
+    },
     // 添加这个方法
+    getStatusNameByValue(value) {
+      const status = this.statusOptions.find(opt => opt.value === value);
+      return status ? status.label : value;
+    },
+    // 原来的国家地区转换方法
     getCountryNameByCode(code) {
       const country = this.countryList.find(c => c.code === code);
       return country ? country.name : code;
@@ -646,14 +694,15 @@ export default {
       }).then(() => {
         this.getList()
         this.$modal && this.$modal.msgSuccess && this.$modal.msgSuccess("删除成功")
-      }).catch(() => {})
+      }).catch(() => {
+      })
     },
 
     // 导出（使用项目全局 download 方法）
     handleExport() {
       // fallback: 如果全局 this.download 存在就使用，否则提示
       if (this.download) {
-        this.download('system/customer/export', { ...this.queryParams }, `customer_${new Date().getTime()}.xlsx`)
+        this.download('system/customer/export', {...this.queryParams}, `customer_${new Date().getTime()}.xlsx`)
       } else {
         this.$modal && this.$modal.msgWarning && this.$modal.msgWarning("导出功能未实现")
       }
@@ -721,10 +770,22 @@ export default {
 .small-padding {
   padding: 0 6px;
 }
+
 .fixed-width {
   width: 140px;
 }
+
 .mb8 {
   margin-bottom: 8px;
+}
+
+.desc-dialog .el-dialog {
+  max-width: 800px; /* 最大宽度限制 */
+  width: 60%;     /* 基础宽度 */
+}
+.desc-content {
+  max-height: 60vh; /* 最大高度限制，防止内容过长 */
+  overflow-y: auto; /* 添加滚动条 */
+  padding: 10px;
 }
 </style>
