@@ -48,7 +48,6 @@ public class CustomerController extends BaseController {
         if (!getLoginUser().getUser().isAdmin()) {
             customer.setCreateUserId(getUserId());
         }
-        customer.setCreateUserId(getUserId());
         List<Customer> list = customerService.selectCustomerList(customer);
         return getDataTable(list);
     }
