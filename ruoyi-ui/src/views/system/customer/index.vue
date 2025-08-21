@@ -305,7 +305,7 @@
               </el-popover>
             </template>
           </div>
-          <span v-else>无附件</span>
+          <span v-else></span>
         </template>
       </el-table-column>
 
@@ -461,6 +461,7 @@
 
         <el-form-item label="上传附件" prop="attachment">
           <FileUpload
+            v-model="fileAttachments"
             :limit="3"
             :fileSize="10"
             :fileType="['pdf', 'docx', 'xlsx', 'jpg', 'png', 'jpeg']"
@@ -630,17 +631,18 @@ export default {
     },
 
     handleAttachmentUploadSuccess(response, file) {
-      if (response && file) {
-        const fileUrl = response.url || (response.data && response.data.url) || '';
-        if (fileUrl) {
-          const originalFilename = file.name || (response.data && response.data.originalFilename) || response.originalFilename || 'unknown_file';
-          const fileObj = {
-            url: fileUrl,
-            originalFilename: originalFilename
-          };
-          this.fileAttachments.push(fileObj);
-        }
-      }
+      // if (response && file) {
+      //   const fileUrl = response.url || (response.data && response.data.url) || '';
+      //   if (fileUrl) {
+      //     const originalFilename = file.name || (response.data && response.data.originalFilename) || response.originalFilename || 'unknown_file';
+      //     const fileObj = {
+      //       url: fileUrl,
+      //       originalFilename: originalFilename,
+      //       name: file.fileName
+      //     };
+      //     this.fileAttachments.push(fileObj);
+      //   }
+      // }
     },
     addFollowup() {
       this.form.followups.push({
@@ -765,7 +767,7 @@ export default {
           // 把附件存为 JSON 数组
           this.form.attachment = this.fileAttachments.length > 0
             ? JSON.stringify(this.fileAttachments)
-            : null;
+            : JSON.stringify([]);
 
           const payload = {
             ...this.form,

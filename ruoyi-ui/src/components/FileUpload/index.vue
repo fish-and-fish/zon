@@ -190,7 +190,7 @@ export default {
     // 上传成功回调
     handleUploadSuccess(res, file) {
       if (res.code === 200) {
-        this.uploadList.push({ name: res.fileName, url: res.fileName })
+        this.uploadList.push({ name: res.fileName, url: res.url, originalFilename: res.originalFilename })
         this.uploadedSuccessfully()
         this.$emit("on-success", res, file)
       } else {
@@ -205,14 +205,16 @@ export default {
     handleDelete(index) {
       this.fileList.splice(index, 1)
       this.$emit("input", this.listToString(this.fileList))
+      this.$emit("fileAttachments", this.fileList)
     },
     // 上传结束处理
     uploadedSuccessfully() {
       if (this.number > 0 && this.uploadList.length === this.number) {
         this.fileList = this.fileList.concat(this.uploadList)
+        this.$emit("fileAttachments", this.uploadList)
         this.uploadList = []
         this.number = 0
-        this.$emit("input", this.listToString(this.fileList))
+        this.$emit("input", this.fileList)
         this.$modal.closeLoading()
       }
     },
