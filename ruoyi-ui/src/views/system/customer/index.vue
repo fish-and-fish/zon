@@ -879,7 +879,7 @@ export default {
         const attachments = JSON.parse(attachmentData);
         if (Array.isArray(attachments)) {
           return attachments.map(attach => ({
-            url: attach.url,
+            url: process.env.VUE_APP_BASE_API + attach.url,
             originalFilename: attach.originalFilename || attach.url.split('/').pop()
           }));
         } else if (typeof attachments === "object") {
