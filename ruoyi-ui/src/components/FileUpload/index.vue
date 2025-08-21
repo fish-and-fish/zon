@@ -190,7 +190,7 @@ export default {
     // 上传成功回调
     handleUploadSuccess(res, file) {
       if (res.code === 200) {
-        this.uploadList.push({ name: res.fileName, url: res.url, originalFilename: res.originalFilename })
+        this.uploadList.push({ name: res.fileName, url: res.fileName, originalFilename: res.originalFilename })
         this.uploadedSuccessfully()
         this.$emit("on-success", res, file)
       } else {
