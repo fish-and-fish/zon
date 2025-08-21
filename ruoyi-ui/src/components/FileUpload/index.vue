@@ -130,6 +130,7 @@ export default {
               item = { name: item, url: item }
             }
             item.uid = item.uid || new Date().getTime() + temp++
+            item.name = item.originalFilename || item.name
             return item
           })
         } else {
@@ -191,6 +192,7 @@ export default {
       if (res.code === 200) {
         this.uploadList.push({ name: res.fileName, url: res.fileName })
         this.uploadedSuccessfully()
+        this.$emit("on-success", res, file)
       } else {
         this.number--
         this.$modal.closeLoading()

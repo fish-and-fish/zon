@@ -286,14 +286,23 @@
         <template slot-scope="scope">
           <div v-if="scope.row.attachment">
             <template v-for="(file, index) in parseAttachment(scope.row.attachment)">
-              <el-link
+              <el-popover
                 :key="index"
-                :underline="false"
-                @click="openFilePreview(file)"
-                style="cursor: pointer; color: #409EFF; display: block; margin-bottom: 5px;"
+                placement="right"
+                trigger="hover"
+                width="220"
               >
-                {{ file.originalFilename }}
-              </el-link>
+                <img :src="file.url" alt="预览" style="max-width: 200px; max-height: 200px;" />
+
+                <el-link
+                  slot="reference"
+                  :underline="false"
+                  @click="openFilePreview(file)"
+                  style="cursor: pointer; color: #409EFF; display: block; margin-bottom: 5px;"
+                >
+                  {{ file.originalFilename }}
+                </el-link>
+              </el-popover>
             </template>
           </div>
           <span v-else>无附件</span>
@@ -456,8 +465,7 @@
             :fileSize="10"
             :fileType="['pdf', 'docx', 'xlsx', 'jpg', 'png', 'jpeg']"
             :disabled="false"
-            @on-success="handleFileUploadSuccess"
-            :uploadFiles="fileAttachments"
+            @on-success="handleAttachmentUploadSuccess"
           />
         </el-form-item>
       </el-form>
@@ -621,22 +629,16 @@ export default {
       return country ? country.name : code;
     },
 
-    handleFileUploadSuccess(response, file) {
-      // 确保response和file都存在
+    handleAttachmentUploadSuccess(response, file) {
       if (response && file) {
-        // 获取文件的URL
         const fileUrl = response.url || (response.data && response.data.url) || '';
         if (fileUrl) {
-          // 创建文件对象并添加到fileAttachments数组
+          const originalFilename = file.name || (response.data && response.data.originalFilename) || response.originalFilename || 'unknown_file';
           const fileObj = {
             url: fileUrl,
-            originalFilename: file.name
+            originalFilename: originalFilename
           };
-          // 避免重复添加
-          const isDuplicate = this.fileAttachments.some(item => item.url === fileUrl);
-          if (!isDuplicate) {
-            this.fileAttachments.push(fileObj);
-          }
+          this.fileAttachments.push(fileObj);
         }
       }
     },
@@ -723,7 +725,6 @@ export default {
       this.multiple = selection.length === 0
     },
 
-// 新增
     handleAdd() {
       this.reset()
       this.open = true
@@ -731,119 +732,6 @@ export default {
       this.isEdit = false   // 新增模式下可编辑
     },
 
-// 修改
-    // 修改handleFileUploadSuccess方法，正确处理上传成功的文件
-    // ... 在methods中找到handleFileUploadSuccess方法，大约在第680行附近
-    handleFileUploadSuccess(response, file) {
-      if (response && file) {
-        // 拿到后端返回的 url
-        const fileUrl = response.url || (response.data && response.data.url) || '';
-        if (fileUrl) {
-          const fileObj = {
-            url: fileUrl,
-            originalFilename: file.name   // 上传时的原始文件名
-          };
-          // 避免重复
-          const isDuplicate = this.fileAttachments.some(item => item.url === fileUrl);
-          if (!isDuplicate) {
-            this.fileAttachments.push(fileObj);
-          }
-        }
-      }
-    },
-    addFollowup() {
-      this.form.followups.push({
-        content: '',
-        date: ''
-      })
-    },
-    removeFollowup(index) {
-      this.form.followups.splice(index, 1)
-    },
-    // 列表查询
-    getList() {
-      this.loading = true
-      listCustomer(this.queryParams).then(response => {
-        // 兼容不同返回格式
-        if (response && response.rows) {
-          this.customerList = response.rows
-          this.total = response.total || (response.rows.length)
-        } else if (response && response.data) {
-          // 如果后端返回 { data: { rows, total } }
-          this.customerList = response.data.rows || []
-          this.total = response.data.total || this.customerList.length
-        } else {
-          this.customerList = []
-          this.total = 0
-        }
-      }).catch(err => {
-        console.error("listCustomer error", err)
-        this.customerList = []
-        this.total = 0
-      }).finally(() => {
-        this.loading = false
-      })
-    },
-
-    // 搜索
-    handleQuery() {
-      this.queryParams.pageNum = 1
-      this.getList()
-    },
-
-    cancel() {
-      this.open = false
-    },
-
-    // 重置查询
-    resetQuery() {
-      // 重置 queryParams 到初始值
-      this.queryParams = {
-        pageNum: 1,
-        pageSize: 10,
-        customerId: null,
-        companyName: null,
-        customerName: null,
-        status: null,
-        customerType: null,
-        customerSource: null,
-        customerDescription: null,
-        countryRegion: null,
-        customerLevel: null,
-        // createdAt: null,
-        // followupContent: null,
-        // followupDate: null,
-        followups: [],
-        position: null,
-        contactPhone: null,
-        email: null,
-        otherContact: null,
-        companyWebsite: null,
-        companyAddress: null,
-        attachment: null
-      }
-      // 如果有 queryForm 引用，重置表单控件状态
-      this.resetForm("queryForm")
-      this.getList()
-    },
-
-    // 选择变更
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
-      this.single = selection.length !== 1
-      this.multiple = selection.length === 0
-    },
-
-// 新增
-    handleAdd() {
-      this.reset()
-      this.open = true
-      this.title = "添加客户信息"
-      this.isEdit = false   // 新增模式下可编辑
-    },
-
-// 修改
-// 修改handleUpdate方法，正确处理编辑时的附件数据
     handleUpdate(row) {
       this.reset();
       const id = row.id;
