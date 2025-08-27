@@ -26,16 +26,16 @@
         />
       </el-form-item>
 
-      <!-- 状态类 下拉框 -->
+      <!-- 客户类型 下拉框 -->
       <el-form-item label="" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态类" clearable>
+        <el-select v-model="queryParams.status" placeholder="请选择客户类型" clearable>
           <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
         </el-select>
       </el-form-item>
 
-      <!-- 客户类型 下拉框 -->
+      <!-- 客户意向 下拉框 -->
       <el-form-item label="" prop="customerType">
-        <el-select v-model="queryParams.customerType" placeholder="请选择客户类型" clearable>
+        <el-select v-model="queryParams.customerType" placeholder="请选择客户意向" clearable>
           <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
         </el-select>
       </el-form-item>
@@ -57,7 +57,7 @@
       <el-form-item label="" prop="customerLevel">
         <el-input
           v-model="queryParams.customerLevel"
-          placeholder="请输入客户等级"
+          placeholder="请输入预计年交易额"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -128,18 +128,18 @@
         >新增
         </el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:customer:edit']"
-        >修改
-        </el-button>
-      </el-col>
+<!--      <el-col :span="1.5">-->
+<!--        <el-button-->
+<!--          type="success"-->
+<!--          plain-->
+<!--          icon="el-icon-edit"-->
+<!--          size="mini"-->
+<!--          :disabled="single"-->
+<!--          @click="handleUpdate"-->
+<!--          v-hasPermi="['system:customer:edit']"-->
+<!--        >修改-->
+<!--        </el-button>-->
+<!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -172,13 +172,14 @@
       <el-table-column label="客户编号" align="center" prop="customerId" width="100px"/>
       <el-table-column label="公司名称" align="center" prop="companyName" width="140px"/>
       <el-table-column label="客户名称" align="center" prop="customerName" width="120px"/>
-      <el-table-column label="状态类" align="center">
+      <el-table-column label="客户类型" align="center">
         <template slot-scope="scope">
           {{ getStatusNameByValue(scope.row.status) }}
         </template>
       </el-table-column>
-      <el-table-column label="客户类型" align="center" prop="customerType"/>
+      <el-table-column label="客户意向" align="center" prop="customerType"/>
       <el-table-column label="客户来源" align="center" prop="customerSource" width="100px"/>
+      <el-table-column label="未联系天数" align="center" prop="daysSinceLastFollowup" width="100px"/>
       <el-table-column
         label="客户描述"
         align="center"
@@ -212,17 +213,13 @@
           {{ getCountryNameByCode(scope.row.countryRegion) }}
         </template>
       </el-table-column>
-      <el-table-column label="客户等级" align="center" prop="customerLevel"/>
-      <!--      <el-table-column label="跟进内容" align="center" prop="followupContent" />-->
-      <!--      <el-table-column label="跟进日期" align="center" prop="followupDate" width="180">-->
-      <!--        <template slot-scope="scope">-->
-      <!--          <span>{{ parseTime(scope.row.followupDate, '{y}-{m}-{d}') }}</span>-->
-      <!--        </template>-->
-      <!--      </el-table-column>-->
+      <el-table-column label="预计年交易额" align="center" prop="customerLevel"/>
       <el-table-column label="职位" align="center" prop="position"/>
       <el-table-column label="联系电话" align="center" prop="contactPhone" width="100px"/>
       <el-table-column label="邮箱" align="center" prop="email" width="100px"/>
       <el-table-column label="其他联系方式" align="center" prop="otherContact" width="120px"/>
+      <el-table-column label="生日" align="center" prop="birthday" width="100px"/>
+      <el-table-column label="性别" align="center" prop="gender" width="80px"/>
       <el-table-column label="公司网站" align="center" prop="companyWebsite" width="100px"/>
       <el-table-column
         label="公司地址"
@@ -364,23 +361,63 @@
 
         <el-row :gutter="12">
           <el-col :span="6">
-            <el-form-item label="状态类" prop="status">
-              <el-select v-model="form.status" placeholder="请选择状态类">
-                <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="9">
-            <el-form-item label="客户类型" prop="customerType">
-              <el-select v-model="form.customerType" placeholder="请选择客户类型">
-                <el-option v-for="opt in customerTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="9">
+              <el-form-item label="客户类型" prop="status">
+                <el-select v-model="form.status" placeholder="请选择客户类型">
+                  <el-option
+                    v-for="opt in statusOptions"
+                    :key="opt.value"
+                    :label="opt.label"
+                    :value="opt.value"
+                  />
+                  <!-- 兜底选项 -->
+                  <el-option
+                    v-if="form.status && !statusOptions.some(opt => opt.value === form.status)"
+                    :label="form.status"
+                    :value="form.status"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="6">
+              <el-form-item label="客户意向" prop="customerType">
+                <el-select v-model="form.customerType" placeholder="请选择客户意向">
+                  <el-option
+                    v-for="opt in customerTypeOptions"
+                    :key="opt.value"
+                    :label="opt.label"
+                    :value="opt.value"
+                  />
+                  <!-- 兜底选项 -->
+                  <el-option
+                    v-if="form.customerType && !customerTypeOptions.some(opt => opt.value === form.customerType)"
+                    :label="form.customerType"
+                    :value="form.customerType"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          <el-col :span="6">
             <el-form-item label="客户来源" prop="customerSource">
               <el-select v-model="form.customerSource" placeholder="请选择客户来源">
                 <el-option v-for="opt in customerSourceOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="预计年交易额" prop="customerLevel">
+              <el-select v-model="form.customerLevel" placeholder="请选择预计年交易额" clearable>
+                <el-option
+                  v-for="opt in customerLevels"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :value="opt.value"
+                />
+                <el-option
+                  v-if="form.customerLevel && !customerLevels.some(opt => opt.value === form.customerLevel)"
+                  :label="form.customerLevel"
+                  :value="form.customerLevel"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -421,18 +458,34 @@
         </el-form-item>
 
         <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item label="客户等级" prop="customerLevel">
-              <el-input v-model="form.customerLevel" placeholder="请输入客户等级"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="职位" prop="position">
               <el-input v-model="form.position" placeholder="请输入职位"/>
             </el-form-item>
           </el-col>
+          <el-col :span="8">
+            <el-form-item label="生日" prop="birthday">
+              <el-date-picker v-model="form.birthday" type="date" placeholder="选择生日" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="性别" prop="gender">
+              <el-select v-model="form.gender" placeholder="选择性别" clearable>
+                <el-option
+                  v-for="opt in genders"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :value="opt.value"
+                />
+                <el-option
+                  v-if="form.gender && !genders.some(opt => opt.value === form.gender)"
+                  :label="form.gender"
+                  :value="form.gender"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
-
         <el-row :gutter="12">
           <el-col :span="8">
             <el-form-item label="联系电话" prop="contactPhone">
@@ -512,15 +565,27 @@ export default {
       previewDialogContent: null,
       // 下拉选项（可以根据需要改为从后端拉取）
       statusOptions: [
-        {label: "活跃P2", value: "P2"},      // 注意：实际存储值我这里用 "P2"
-        {label: "非活跃", value: "INACTIVE"}
+        {label: "战略重点客户", value: "战略重点客户"},      // 注意：实际存储值我这里用 "P2"
+        {label: "保持型客户", value: "保持型客户"},
+        {label: "培育型客户", value: "培育型客户"},
+        {label: "淘汰型客户", value: "淘汰型客户"},
       ],
       customerTypeOptions: [
         {label: "订单客户", value: "订单客户"},
         {label: "样单客户", value: "样单客户"},
-        {label: "重潜客户", value: "重潜客户"},
-        {label: "轻潜客户", value: "轻潜客户"},
-        {label: "无潜客户", value: "无潜客户"}
+        {label: "A级客户", value: "A级客户"},
+        {label: "B级客户", value: "B级客户"},
+        {label: "C级客户", value: "C级客户"},
+      ],
+      customerLevels: [
+        {label: "$1k以下", value: "$1k以下"},
+        {label: "$1k-$10k", value: "$1k-$10k"},
+        {label: "$10k-$100k", value: "$10k-$100k"},
+        {label: "$1M以上", value: "$1M以上"},
+      ],
+      genders: [
+        {label: "男", value: "男"},
+        {label: "女", value: "女"},
       ],
       customerSourceOptions: [
         {label: "阿里国际站", value: "阿里国际站"},
@@ -543,6 +608,8 @@ export default {
         customerName: null,
         status: null,
         customerType: null,
+        gender: null,
+        birthday: null,
         customerSource: null,
         customerDescription: null,
         countryRegion: null,
@@ -566,6 +633,8 @@ export default {
         customerName: null,
         status: null,
         customerType: null,
+        gender: null,
+        birthday: null,
         customerSource: null,
         customerDescription: null,
         countryRegion: null,
@@ -597,10 +666,10 @@ export default {
           {required: true, message: "客户名称不能为空", trigger: "blur"}
         ],
         status: [
-          {required: true, message: "状态类不能为空", trigger: "change"}
+          {required: true, message: "客户类型不能为空", trigger: "change"}
         ],
         customerType: [
-          {required: true, message: "客户类型不能为空", trigger: "change"}
+          {required: true, message: "客户意向不能为空", trigger: "change"}
         ],
         customerSource: [
           {required: true, message: "客户来源不能为空", trigger: "change"}
@@ -840,6 +909,8 @@ export default {
         customerName: null,
         status: null,
         customerType: null,
+        gender: null,
+        birthday: null,
         customerSource: null,
         customerDescription: null,
         countryRegion: null,
